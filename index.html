@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>統計検定DSエキスパート対策</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1b2a;
+  --surface: #1b2d45;
+  --surface2: #243b55;
+  --accent: #4a9eff;
+  --accent2: #2d7dd2;
+  --text: #e8edf2;
+  --text-muted: #8899aa;
+  --green: #22c55e;
+  --green-bg: #14532d;
+  --red: #ef4444;
+  --red-bg: #7f1d1d;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+}
+
+#app {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: var(--surface);
+  padding: 16px 20px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--surface2);
+}
+
+.header-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.progress-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+/* ===== SCREENS ===== */
+.screen { display: none; flex: 1; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ===== START SCREEN ===== */
+#start-screen {
+  justify-content: center;
+  align-items: center;
+  padding: 32px 24px;
+  gap: 24px;
+}
+
+.app-logo {
+  text-align: center;
+}
+
+.app-logo h1 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.app-logo p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.category-section { width: 100%; }
+
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.category-card {
+  background: var(--surface);
+  border: 2px solid var(--surface2);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.category-card.selected {
+  border-color: var(--accent);
+  background: var(--surface2);
+}
+
+.category-card:active { opacity: 0.8; }
+
+.category-icon { font-size: 24px; margin-bottom: 6px; }
+
+.category-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.category-count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: opacity 0.2s;
+}
+
+.btn-primary:active { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: default; }
+
+/* ===== QUIZ SCREEN ===== */
+#quiz-screen { padding: 20px 16px; gap: 16px; }
+
+.question-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--surface2);
+  color: var(--text-muted);
+}
+
+.badge.cat-prob { background: #1e3a5f; color: #60a5fa; }
+.badge.cat-dist { background: #3b1f5e; color: #c084fc; }
+.badge.cat-est  { background: #1e4d3a; color: #4ade80; }
+.badge.cat-test { background: #4d2a1e; color: #fb923c; }
+.badge.diff-base { background: #1a2e1a; color: #86efac; }
+.badge.diff-std  { background: #2e2a1a; color: #fde68a; }
+.badge.diff-adv  { background: #2e1a1a; color: #fca5a5; }
+
+.question-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.question-text {
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--surface2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1.5;
+}
+
+.option-btn:active:not(:disabled) { opacity: 0.8; }
+.option-btn:disabled { cursor: default; }
+
+.option-btn.correct {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: #bbf7d0;
+}
+
+.option-btn.wrong {
+  border-color: var(--red);
+  background: var(--red-bg);
+  color: #fecaca;
+}
+
+/* 数値入力 */
+.number-input-wrap {
+  display: flex;
+  gap: 10px;
+}
+
+.number-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 2px solid var(--surface2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.number-input:focus { border-color: var(--accent); }
+
+.btn-submit {
+  padding: 14px 20px;
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btn-submit:disabled { opacity: 0.4; cursor: default; }
+
+/* フィードバック */
+.feedback-card {
+  border-radius: var(--radius);
+  padding: 16px;
+  display: none;
+}
+
+.feedback-card.correct {
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  display: block;
+}
+
+.feedback-card.wrong {
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  display: block;
+}
+
+.feedback-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feedback-card.correct .feedback-title { color: var(--green); }
+.feedback-card.wrong .feedback-title { color: var(--red); }
+
+.feedback-explanation {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.btn-next {
+  width: 100%;
+  padding: 16px;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: none;
+}
+
+.btn-next.visible { display: block; }
+.btn-next:active { background: var(--surface2); }
+
+/* ===== RESULT SCREEN ===== */
+#result-screen {
+  justify-content: flex-start;
+  padding: 24px 16px;
+  gap: 20px;
+}
+
+.result-hero {
+  text-align: center;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.result-score {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.result-score-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+.result-rate {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.result-categories {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.result-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--surface2);
+}
+
+.result-cat-row:last-child { border-bottom: none; }
+
+.result-cat-name {
+  width: 48px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.result-cat-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.result-cat-bar {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+}
+
+.result-cat-pct {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  width: 36px;
+  text-align: right;
+}
+
+.btn-restart {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.btn-restart:active { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="main-header" style="display:none">
+    <div class="header-title">統計検定DSエキスパート対策</div>
+    <div class="progress-row">
+      <span class="progress-label" id="progress-label">1 / 20</span>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- スタート画面 -->
+  <section id="start-screen" class="screen active">
+    <div class="app-logo">
+      <h1>📊 統計検定<br>DSエキスパート対策</h1>
+      <p>本番レベルの問題で実力を試そう</p>
+    </div>
+    <div class="category-section">
+      <div class="section-label">カテゴリを選ぶ</div>
+      <div class="category-grid">
+        <div class="category-card selected" data-cat="統計基礎">
+          <div class="category-icon">📐</div>
+          <div class="category-name">統計基礎</div>
+          <div class="category-count">20問</div>
+        </div>
+        <div class="category-card" data-cat="coming" style="opacity:0.4;cursor:default">
+          <div class="category-icon">🔜</div>
+          <div class="category-name">機械学習</div>
+          <div class="category-count">準備中</div>
+        </div>
+        <div class="category-card" data-cat="coming" style="opacity:0.4;cursor:default">
+          <div class="category-icon">🔜</div>
+          <div class="category-name">深層学習</div>
+          <div class="category-count">準備中</div>
+        </div>
+        <div class="category-card" data-cat="coming" style="opacity:0.4;cursor:default">
+          <div class="category-icon">🔜</div>
+          <div class="category-name">データ処理</div>
+          <div class="category-count">準備中</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" id="btn-start">スタート</button>
+  </section>
+
+  <!-- クイズ画面 -->
+  <section id="quiz-screen" class="screen">
+    <div class="question-meta">
+      <span class="badge" id="badge-cat">確率</span>
+      <span class="badge" id="badge-diff">基礎</span>
+    </div>
+    <div class="question-card">
+      <p class="question-text" id="question-text"></p>
+    </div>
+    <div id="options-area"></div>
+    <div class="feedback-card" id="feedback-card">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-explanation" id="feedback-explanation"></div>
+    </div>
+    <button class="btn-next" id="btn-next">次の問題 →</button>
+  </section>
+
+  <!-- 結果画面 -->
+  <section id="result-screen" class="screen">
+    <div class="result-hero">
+      <div class="result-score" id="result-score">0</div>
+      <div class="result-score-label">正解数 / 20問</div>
+      <div class="result-rate" id="result-rate">正答率 0%</div>
+    </div>
+    <div class="section-label">カテゴリ別成績</div>
+    <div class="result-categories" id="result-categories"></div>
+    <button class="btn-restart" id="btn-restart">もう一度挑戦する</button>
+  </section>
+</div>
+<script>
+const QUESTIONS = [
+  // ===== 確率 5問 =====
+  {
+    id: 1, type: "choice", category: "確率", difficulty: "標準",
+    question: "ある病気の有病率は1%である。この病気の検査は感度90%（病気の人が陽性になる確率）、特異度95%（健常者が陰性になる確率）である。検査で陽性になった人が実際に病気である確率（陽性的中率）はいくらか。",
+    options: [
+      "約15.4%",
+      "約47.4%",
+      "約90.0%",
+      "約8.3%",
+      "約50.0%"
+    ],
+    answer: 0,
+    explanation: "ベイズの定理を使う。1000人中：病気10人（陽性9人）、健常990人（偽陽性49.5人）。陽性的中率 = 9 / (9+49.5) ≈ 15.3%。有病率が低いと感度が高くても陽性的中率は低くなる（偽陽性問題）。これは医療診断で重要な概念。"
+  },
+  {
+    id: 2, type: "choice", category: "確率", difficulty: "基礎",
+    question: "事象AとBが独立であるとき、P(A∩B) はどのように表されるか。",
+    options: [
+      "P(A) + P(B)",
+      "P(A) × P(B|A)",
+      "P(A) × P(B)",
+      "P(A|B) × P(B|A)",
+      "P(A) + P(B) - P(A∪B)"
+    ],
+    answer: 2,
+    explanation: "独立とは「一方の結果が他方に影響しない」こと。独立のとき P(A|B)=P(A) が成り立ち、乗法定理 P(A∩B)=P(A)×P(B|A) に代入すると P(A∩B)=P(A)×P(B) となる。互いに排反（P(A∩B)=0）と混同しないこと。"
+  },
+  {
+    id: 3, type: "choice", category: "確率", difficulty: "標準",
+    question: "P(A)=0.4、P(B)=0.3、P(A∩B)=0.12 のとき、P(A|B)（BのときAの条件付き確率）はいくらか。",
+    options: [
+      "0.12",
+      "0.30",
+      "0.40",
+      "0.52",
+      "0.70"
+    ],
+    answer: 2,
+    explanation: "条件付き確率の定義：P(A|B) = P(A∩B) / P(B) = 0.12 / 0.3 = 0.4。結果がP(A)と同じになることから、この場合AとBは独立（P(A∩B)=P(A)×P(B)=0.12 が成立）であることも確認できる。"
+  },
+  {
+    id: 4, type: "choice", category: "確率", difficulty: "標準",
+    question: "全確率の法則について正しい説明はどれか。事象 B₁, B₂, B₃ は互いに排反で全体を尽くす（完全系）とする。",
+    options: [
+      "P(A) = P(A|B₁) + P(A|B₂) + P(A|B₃)",
+      "P(A) = P(A∩B₁) × P(A∩B₂) × P(A∩B₃)",
+      "P(A) = P(A|B₁)P(B₁) + P(A|B₂)P(B₂) + P(A|B₃)P(B₃)",
+      "P(A) = P(B₁|A) + P(B₂|A) + P(B₃|A)",
+      "P(A) = P(B₁)P(B₂)P(B₃)"
+    ],
+    answer: 2,
+    explanation: "全確率の法則：P(A) = Σ P(A|Bᵢ)P(Bᵢ)。AはB₁,B₂,B₃の各場合に分解でき、それぞれP(A∩Bᵢ)=P(A|Bᵢ)P(Bᵢ)の和。ベイズの定理の分母に使われる重要な公式。事前確率P(Bᵢ)で重み付けした条件付き確率の平均と解釈できる。"
+  },
+  {
+    id: 5, type: "number", category: "確率", difficulty: "応用",
+    question: "袋に赤玉3個、白玉2個が入っている。非復元抽出で2個取り出すとき、2個とも赤玉である確率を小数で答えよ（小数第2位まで）。",
+    answer: 0.30,
+    tolerance: 0.01,
+    explanation: "乗法定理で計算：1個目が赤 = 3/5、2個目も赤（非復元）= 2/4。P = (3/5)×(2/4) = 6/20 = 0.3。組合せで解くと C(3,2)/C(5,2) = 3/10 = 0.30。非復元では分母が1減ることに注意。"
+  },
+  // ===== 分布 5問 =====
+  {
+    id: 6, type: "choice", category: "分布", difficulty: "標準",
+    question: "正規分布 N(50, 100) に従う確率変数Xについて、P(X ≤ 60) の値として最も近いものはどれか。標準正規分布表より Φ(1.0)=0.8413。",
+    options: [
+      "0.5000",
+      "0.6915",
+      "0.8413",
+      "0.9772",
+      "0.3413"
+    ],
+    answer: 2,
+    explanation: "標準化：Z = (X-μ)/σ = (60-50)/√100 = 10/10 = 1.0。P(X≤60) = P(Z≤1.0) = Φ(1.0) = 0.8413。N(μ,σ²)の表記に注意（σ²=100 → σ=10）。標準化は（値－平均）÷標準偏差。"
+  },
+  {
+    id: 7, type: "choice", category: "分布", difficulty: "基礎",
+    question: "中心極限定理について、最も正確な説明はどれか。",
+    options: [
+      "母集団が正規分布なら標本平均も正規分布に従う",
+      "どんな母集団でもサンプルサイズnが大きければ標本平均は正規分布に近づく",
+      "標本サイズが30以上であれば標本平均は必ず正規分布に従う",
+      "母集団の分布が正規分布でなければ中心極限定理は使えない",
+      "標本平均の期待値は常に母平均と一致する"
+    ],
+    answer: 1,
+    explanation: "中心極限定理：母集団の分布形状によらず、n→∞のとき標本平均X̄はN(μ, σ²/n)に近づく。「n≥30で正規分布」は目安であり厳密ではない。選択肢5は正しいが中心極限定理の核心ではない。母集団が正規なら選択肢1も正しいが限定的。"
+  },
+  {
+    id: 8, type: "choice", category: "分布", difficulty: "標準",
+    question: "ポアソン分布 Po(λ) の性質として正しいものはどれか。",
+    options: [
+      "期待値はλ、分散はλ²",
+      "期待値はλ²、分散はλ",
+      "期待値も分散もλ",
+      "期待値はλ、分散は√λ",
+      "期待値は1/λ、分散はλ"
+    ],
+    answer: 2,
+    explanation: "ポアソン分布の特徴：E[X]=λ、Var(X)=λ（期待値＝分散）。これはポアソン分布を特徴付ける重要な性質。単位時間あたり平均λ件の希少事象をモデル化。二項分布B(n,p)でn→∞、p→0、np=λ一定のときポアソン分布に近似できる。"
+  },
+  {
+    id: 9, type: "choice", category: "分布", difficulty: "標準",
+    question: "二項分布B(n,p)を正規分布で近似できる条件として一般に用いられるものはどれか。",
+    options: [
+      "n ≥ 30",
+      "np ≥ 5 かつ n(1-p) ≥ 5",
+      "p ≥ 0.5",
+      "n ≥ 100",
+      "np ≥ 10 のみ"
+    ],
+    answer: 1,
+    explanation: "正規近似の条件：np≥5 かつ n(1-p)≥5（または両方≥10とする基準も）。これにより B(n,p) ≈ N(np, np(1-p)) と近似できる。pが0や1に近いとき（非対称）は近似精度が落ちる。連続修正（±0.5）を加えると精度が上がる。"
+  },
+  {
+    id: 10, type: "choice", category: "分布", difficulty: "応用",
+    question: "カイ二乗分布 χ²(k) について正しい説明はどれか。",
+    options: [
+      "k個の正規分布の和はカイ二乗分布に従う",
+      "k個の独立な標準正規変数の平方和はχ²(k)に従う",
+      "カイ二乗分布は常に対称な分布である",
+      "自由度kのカイ二乗分布の期待値はk²である",
+      "k個の独立な一様分布の和はχ²(k)に従う"
+    ],
+    answer: 1,
+    explanation: "χ²(k)の定義：Z₁,…,Zk が独立にN(0,1)に従うとき、Z₁²+…+Zk² ～ χ²(k)。期待値=k、分散=2k。右に裾が長い非対称分布（k≤2で単調減少）。kが大きくなると正規分布に近づく。適合度検定・独立性検定・分散の検定に使われる。"
+  },
+  // ===== 推定 5問 =====
+  {
+    id: 11, type: "choice", category: "推定", difficulty: "応用",
+    question: "正規分布N(μ,σ²)からn個のサンプルを得たとき、μの最尤推定量はどれか。",
+    options: [
+      "中央値",
+      "標本平均 x̄ = (1/n)Σxᵢ",
+      "標本分散 s² = (1/n)Σ(xᵢ-x̄)²",
+      "最小値と最大値の平均",
+      "σ²/n"
+    ],
+    answer: 1,
+    explanation: "正規分布の対数尤度を最大化するとμの推定量として標本平均x̄が得られる。σ²の最尤推定量は(1/n)Σ(xᵢ-x̄)²（nで割る）であり、これは不偏推定量でないことに注意。μの最尤推定量は不偏性・一致性・有効性をすべて満たす優れた推定量。"
+  },
+  {
+    id: 12, type: "choice", category: "推定", difficulty: "基礎",
+    question: "不偏推定量の定義として正しいものはどれか。",
+    options: [
+      "推定量の分散が最小であること",
+      "サンプルサイズを増やすと真値に収束すること",
+      "推定量の期待値が真のパラメータに一致すること",
+      "推定量の二乗誤差が最小であること",
+      "95%信頼区間が最も狭いこと"
+    ],
+    answer: 2,
+    explanation: "不偏性：E[θ̂]=θ。標本分散の不偏推定量は s²=(1/(n-1))Σ(xᵢ-x̄)²（n-1で割る）。nで割ると不偏でなくなる。不偏性は繰り返し推定したときの平均が真値に等しいという性質。「分散最小不偏推定量（UMVUE）」は不偏性と効率性を両立する。"
+  },
+  {
+    id: 13, type: "choice", category: "推定", difficulty: "標準",
+    question: "母分散σ²=16（既知）、n=64の標本から得た標本平均x̄=20のとき、μの95%信頼区間はどれか。z₀.₀₂₅=1.96とする。",
+    options: [
+      "20 ± 1.96",
+      "20 ± 0.98",
+      "20 ± 3.92",
+      "20 ± 7.84",
+      "20 ± 0.49"
+    ],
+    answer: 1,
+    explanation: "95%CI：x̄ ± z₀.₀₂₅ × (σ/√n) = 20 ± 1.96 × (4/8) = 20 ± 1.96×0.5 = 20 ± 0.98。σ=√16=4、√64=8。標準誤差SE=σ/√n=0.5。信頼区間はパラメータの「あり得る範囲」を示す（「95%の確率でμが含まれる」という表現は厳密には不正確）。"
+  },
+  {
+    id: 14, type: "choice", category: "推定", difficulty: "基礎",
+    question: "標準誤差（SE）の正しい説明はどれか。",
+    options: [
+      "データの標準偏差と同じ値",
+      "標本平均の標準偏差（σ/√n）",
+      "標本分散の平方根",
+      "母平均と標本平均の差",
+      "推定量の二乗誤差の期待値"
+    ],
+    answer: 1,
+    explanation: "標準誤差SE=σ/√n は標本平均の標準偏差。サンプルサイズが4倍になるとSEは半分になる。標準偏差（データのばらつき）と混同しないこと。σ未知のとき標本標準偏差s で代替：SE=s/√n。信頼区間の幅はSEに比例する。"
+  },
+  {
+    id: 15, type: "choice", category: "推定", difficulty: "応用",
+    question: "一致推定量の定義として正しいものはどれか。",
+    options: [
+      "E[θ̂]=θ が常に成り立つ推定量",
+      "n→∞のとき θ̂ が確率収束で真値θに近づく推定量",
+      "分散が最小の不偏推定量",
+      "最尤法で得られる推定量",
+      "全てのサンプルで同じ値をとる推定量"
+    ],
+    answer: 1,
+    explanation: "一致性：n→∞のとき P(|θ̂-θ|>ε)→0（任意のε>0）。標本平均は大数の法則より一致推定量。不偏性とは別概念（不偏でも一致性なし・一致性あっても不偏でない場合がある）。MLE（最尤推定量）は一般に一致性・漸近正規性・漸近有効性を持つ。"
+  },
+  // ===== 検定 5問 =====
+  {
+    id: 16, type: "choice", category: "検定", difficulty: "基礎",
+    question: "新薬の効果を検証する臨床試験で、帰無仮説（H₀）と対立仮説（H₁）の正しい組み合わせはどれか。",
+    options: [
+      "H₀：新薬は効果あり、H₁：新薬は効果なし",
+      "H₀：新薬は効果なし、H₁：新薬は効果あり",
+      "H₀：新薬は効果なし、H₁：新薬は有害",
+      "H₀：新薬が最も効果的、H₁：他の薬が効果的",
+      "H₀：サンプルサイズが十分、H₁：不十分"
+    ],
+    answer: 1,
+    explanation: "帰無仮説は「差なし・効果なし」（棄却したい仮説）、対立仮説は「効果あり」（証明したいこと）。これは「疑わしきは罰せず」の原則と同様で、証拠なしに効果を認めない保守的立場。帰無仮説を棄却できれば「統計的有意」となり効果の証拠とみなす。"
+  },
+  {
+    id: 17, type: "choice", category: "検定", difficulty: "標準",
+    question: "第一種過誤（α）と第二種過誤（β）の説明として正しいものはどれか。",
+    options: [
+      "α：H₀が真なのに棄却する誤り、β：H₀が偽なのに棄却しない誤り",
+      "α：H₀が偽なのに棄却しない誤り、β：H₀が真なのに棄却する誤り",
+      "α：サンプルサイズが小さすぎる誤り、β：大きすぎる誤り",
+      "α：測定誤差、β：系統誤差",
+      "α：p値が大きすぎる誤り、β：小さすぎる誤り"
+    ],
+    answer: 0,
+    explanation: "第一種過誤α（偽陽性）：真のH₀を誤って棄却。有意水準＝αを設定することで制御。第二種過誤β（偽陰性）：偽のH₀を棄却しない。検出力=1-β。αを下げるとβが上がるトレードオフ関係。医薬品承認ではα=0.05（稀に0.01）が慣例。"
+  },
+  {
+    id: 18, type: "choice", category: "検定", difficulty: "標準",
+    question: "p値の正しい解釈はどれか。",
+    options: [
+      "帰無仮説が正しい確率",
+      "対立仮説が正しい確率",
+      "帰無仮説が正しいと仮定したとき、観測された結果以上に極端な結果が得られる確率",
+      "実験を繰り返したときに同じ結果が得られる確率",
+      "効果量の大きさを示す指標"
+    ],
+    answer: 2,
+    explanation: "p値＝「H₀が真のもとで現データ以上に極端なデータが得られる確率」。p<0.05なら「H₀のもとでは滅多に起きないこと」が起きたとしてH₀を棄却。p値はH₀の正しさの確率ではない（よくある誤解）。小さいp値≠大きな効果量（サンプルサイズ依存）。"
+  },
+  {
+    id: 19, type: "choice", category: "検定", difficulty: "応用",
+    question: "母分散σ²未知の場合、1標本t検定の検定統計量はどれか。n：サンプル数、x̄：標本平均、μ₀：帰無仮説の値、s：標本標準偏差。",
+    options: [
+      "t = (x̄ - μ₀) / (σ/√n)",
+      "t = (x̄ - μ₀) / (s/√n)",
+      "t = (x̄ - μ₀)² / s²",
+      "t = n(x̄ - μ₀) / s",
+      "t = (x̄ - μ₀) × √n / σ²"
+    ],
+    answer: 1,
+    explanation: "t統計量 = (x̄-μ₀)/(s/√n)。これはt(n-1)分布に従う。σ既知ならzに代替できるが、未知の場合はs（標本標準偏差）で推定しt分布を使う。自由度はn-1（s²推定で1自由度消費）。nが大きくなるとt分布は標準正規分布に近づく。"
+  },
+  {
+    id: 20, type: "choice", category: "検定", difficulty: "応用",
+    question: "検出力（1-β）を高める方法として正しいものはどれか。",
+    options: [
+      "有意水準αを下げる",
+      "サンプルサイズnを増やす",
+      "対立仮説をより広く設定する",
+      "両側検定から片側検定に変更する（事後的に）",
+      "データの測定精度を下げる"
+    ],
+    answer: 1,
+    explanation: "検出力=1-β（真に差があるとき検出できる確率）。nを増やすと標準誤差が減り、差を検出しやすくなる。αを下げると逆にβが増えて検出力が下がる。事後的な片側検定への変更は多重検定の問題でNG。効果量を大きくする（測定精度向上）も有効だが、選択肢では「下げる」なのでNG。"
+  }
+];
+// ===== APP STATE =====
+let state = {
+  questions: [],
+  current: 0,
+  answers: [],
+  selectedCategory: "統計基礎"
+};
+
+// ===== HELPERS =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function $(id) { return document.getElementById(id); }
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(name + '-screen').classList.add('active');
+  const header = $('main-header');
+  header.style.display = (name === 'quiz') ? 'block' : 'none';
+}
+
+const CAT_CLASS = { "確率": "cat-prob", "分布": "cat-dist", "推定": "cat-est", "検定": "cat-test" };
+const DIFF_CLASS = { "基礎": "diff-base", "標準": "diff-std", "応用": "diff-adv" };
+
+// ===== RENDER QUESTION =====
+function renderQuestion() {
+  const q = state.questions[state.current];
+  const total = state.questions.length;
+  const idx = state.current;
+
+  // progress
+  $('progress-label').textContent = `${idx + 1} / ${total}`;
+  $('progress-bar').style.width = `${((idx) / total) * 100}%`;
+
+  // badges
+  const bc = $('badge-cat');
+  bc.textContent = q.category;
+  bc.className = 'badge ' + (CAT_CLASS[q.category] || '');
+  const bd = $('badge-diff');
+  bd.textContent = q.difficulty;
+  bd.className = 'badge ' + (DIFF_CLASS[q.difficulty] || '');
+
+  // question
+  $('question-text').textContent = q.question;
+
+  // options area
+  const area = $('options-area');
+  area.innerHTML = '';
+
+  if (q.type === 'choice') {
+    const list = document.createElement('div');
+    list.className = 'options-list';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = `${String.fromCharCode(65 + i)}. ${opt}`;
+      btn.addEventListener('click', () => handleChoice(i));
+      list.appendChild(btn);
+    });
+    area.appendChild(list);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'number-input-wrap';
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'number-input';
+    input.placeholder = '数値を入力';
+    input.step = 'any';
+    input.id = 'num-input';
+    const btn = document.createElement('button');
+    btn.className = 'btn-submit';
+    btn.textContent = '確認';
+    btn.addEventListener('click', () => handleNumber(parseFloat(input.value)));
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+    wrap.appendChild(input);
+    wrap.appendChild(btn);
+    area.appendChild(wrap);
+  }
+
+  // reset feedback
+  const fb = $('feedback-card');
+  fb.className = 'feedback-card';
+  $('btn-next').classList.remove('visible');
+}
+
+// ===== HANDLE ANSWERS =====
+function showFeedback(correct, q) {
+  const fb = $('feedback-card');
+  $('feedback-title').textContent = correct ? '✓ 正解！' : '✗ 不正解';
+  $('feedback-explanation').textContent = q.explanation;
+  fb.className = 'feedback-card ' + (correct ? 'correct' : 'wrong');
+  $('btn-next').classList.add('visible');
+  state.answers.push({ id: q.id, correct, category: q.category });
+}
+
+function handleChoice(idx) {
+  const q = state.questions[state.current];
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(b => b.disabled = true);
+  buttons[q.answer].classList.add('correct');
+  if (idx !== q.answer) buttons[idx].classList.add('wrong');
+  showFeedback(idx === q.answer, q);
+}
+
+function handleNumber(val) {
+  const q = state.questions[state.current];
+  const input = $('num-input');
+  if (isNaN(val)) return;
+  input.disabled = true;
+  document.querySelector('.btn-submit').disabled = true;
+  const correct = Math.abs(val - q.answer) <= (q.tolerance || 0.01);
+  input.style.borderColor = correct ? 'var(--green)' : 'var(--red)';
+  showFeedback(correct, q);
+}
+
+// ===== NEXT QUESTION =====
+$('btn-next').addEventListener('click', () => {
+  state.current++;
+  if (state.current >= state.questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+});
+
+// ===== RESULT =====
+function showResult() {
+  showScreen('result');
+  const total = state.answers.length;
+  const correct = state.answers.filter(a => a.correct).length;
+  $('result-score').textContent = `${correct} / ${total}`;
+  $('result-rate').textContent = `正答率 ${Math.round(correct / total * 100)}%`;
+
+  // category breakdown
+  const cats = ["確率", "分布", "推定", "検定"];
+  const container = $('result-categories');
+  container.innerHTML = '';
+  cats.forEach(cat => {
+    const catAnswers = state.answers.filter(a => a.category === cat);
+    if (!catAnswers.length) return;
+    const ok = catAnswers.filter(a => a.correct).length;
+    const pct = Math.round(ok / catAnswers.length * 100);
+    const row = document.createElement('div');
+    row.className = 'result-cat-row';
+    row.innerHTML = `
+      <span class="result-cat-name">${cat}</span>
+      <div class="result-cat-bar-wrap">
+        <div class="result-cat-bar" style="width:${pct}%"></div>
+      </div>
+      <span class="result-cat-pct">${ok}/${catAnswers.length}</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ===== START =====
+$('btn-start').addEventListener('click', () => {
+  state.questions = shuffle(QUESTIONS);
+  state.current = 0;
+  state.answers = [];
+  showScreen('quiz');
+  renderQuestion();
+});
+
+$('btn-restart').addEventListener('click', () => {
+  showScreen('start');
+});
+
+// category card selection (only "統計基礎" is active)
+document.querySelectorAll('.category-card[data-cat="統計基礎"]').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.selectedCategory = card.dataset.cat;
+  });
+});
+</script>
+</body>
+</html>
