@@ -1,0 +1,31 @@
+name: Fetch SC exam PDFs
+
+on:
+  push:
+    branches: [claude/sc-exam-afternoon-problems-spsd7e]
+    paths: [.github/workflows/fetch-sc-pdf.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download PDFs from IPA
+        run: |
+          mkdir -p pdf
+          base=https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att
+          for f in 2024r06h_sc_pm_qs.pdf 2024r06h_sc_pm_ans.pdf; do
+            curl -fsSL --retry 3 -A "Mozilla/5.0" -o "pdf/$f" "$base/$f"
+            file "pdf/$f"
+          done
+      - name: Commit PDFs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pdf
+          git diff --cached --quiet || git commit -m "Add R6 spring SC afternoon exam PDFs from IPA"
+          git push
