@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SC午後 過去問解説</title>
+<meta name="description" content="情報処理安全確保支援士試験 午後（新形式）の過去問を、問題文の書き起こし・自作解答と解説・公式解答例との照合で整理した学習サイト">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="vendor/marked.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface2: #eef1f5; --border: #dde2e8;
+  --text: #1c2430; --muted: #5d6b7a; --accent: #1f6feb; --accent-weak: #e3edff;
+  --ok: #1a7f37; --ok-weak: #dcf5e3; --mid: #9a6700; --mid-weak: #fff3cd;
+  --ng: #cf222e; --ng-weak: #ffe2e0; --code-bg: #f1f3f6; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --surface: #161c25; --surface2: #1d2531; --border: #2b3544;
+    --text: #e6ebf1; --muted: #93a1b2; --accent: #58a6ff; --accent-weak: #15253d;
+    --ok: #3fb950; --ok-weak: #12301c; --mid: #d29922; --mid-weak: #33270b;
+    --ng: #f85149; --ng-weak: #3b1513; --code-bg: #1b222d; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #161c25; --surface2: #1d2531; --border: #2b3544;
+  --text: #e6ebf1; --muted: #93a1b2; --accent: #58a6ff; --accent-weak: #15253d;
+  --ok: #3fb950; --ok-weak: #12301c; --mid: #d29922; --mid-weak: #33270b;
+  --ng: #f85149; --ng-weak: #3b1513; --code-bg: #1b222d; --shadow: none;
+}
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.75; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+header.top .wrap { display: flex; align-items: center; gap: 12px; height: 56px; }
+.brand { font-weight: 700; color: var(--text); white-space: nowrap; }
+.brand small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+.spacer { flex: 1; }
+.iconbtn { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px; height: 34px; min-width: 34px; cursor: pointer; font-size: 15px; }
+main { padding: 24px 0 64px; }
+h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
+.sub { color: var(--muted); margin: 0 0 20px; font-size: .92rem; }
+.search { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; margin-bottom: 20px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 24px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+.stat b { display: block; font-size: 1.4rem; line-height: 1.2; }
+.stat span { color: var(--muted); font-size: .8rem; }
+.exam { margin-bottom: 28px; }
+.exam-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.exam-h h2 { font-size: 1.1rem; margin: 0; }
+.exam-h a { font-size: .85rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--text); box-shadow: var(--shadow); position: relative; transition: border-color .15s; }
+.card:hover { border-color: var(--accent); text-decoration: none; }
+.card .qno { font-size: .78rem; color: var(--muted); font-weight: 500; }
+.card .theme { font-weight: 700; margin: 2px 0 6px; line-height: 1.45; }
+.card .lead { font-size: .8rem; color: var(--muted); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card .done { position: absolute; top: 10px; right: 12px; font-size: .75rem; color: var(--ok); font-weight: 700; }
+.bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--surface2); margin-top: 10px; }
+.bar i { display: block; height: 100%; }
+.bar .j1 { background: var(--ok); } .bar .j2 { background: color-mix(in srgb, var(--ok) 55%, var(--surface2)); }
+.bar .j3 { background: var(--mid); } .bar .j4 { background: var(--ng); }
+.legend { font-size: .75rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; margin: -8px 0 20px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.crumbs { font-size: .85rem; color: var(--muted); margin-bottom: 8px; }
+.qhead { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 14px; }
+.qhead h1 { flex: 1; min-width: 220px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 18px; overflow-x: auto; }
+.tabs button { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); padding: 10px 14px; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; box-shadow: var(--shadow); }
+.gate { text-align: center; padding: 36px 16px; }
+.gate p { color: var(--muted); margin: 0 0 14px; }
+.btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font: inherit; font-weight: 500; cursor: pointer; }
+.btn.ghost { background: none; color: var(--text); border: 1px solid var(--border); }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--muted); cursor: pointer; user-select: none; }
+.pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.pager a { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: .9rem; }
+/* markdown */
+.md { overflow-wrap: anywhere; }
+.md > :first-child { margin-top: 0; }
+.md h1 { font-size: 1.25rem; margin: 0 0 12px; line-height: 1.5; }
+.md h2 { font-size: 1.1rem; margin: 28px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.md h3 { font-size: 1rem; margin: 22px 0 8px; }
+.md p, .md ul, .md ol { margin: 0 0 12px; }
+.md blockquote { margin: 0 0 14px; padding: 8px 14px; border-left: 3px solid var(--accent); background: var(--accent-weak); border-radius: 0 8px 8px 0; color: var(--text); font-size: .9rem; }
+.md blockquote p { margin: 4px 0; }
+.md code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .85em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; }
+.md pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; line-height: 1.55; }
+.md pre code { background: none; padding: 0; font-size: .8rem; white-space: pre; }
+.tbl { overflow-x: auto; margin: 0 0 14px; border: 1px solid var(--border); border-radius: 8px; }
+.md table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.md th, .md td { border-bottom: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+.md tr:last-child td { border-bottom: none; }
+.md th { background: var(--surface2); font-weight: 700; white-space: nowrap; }
+.md td + td, .md th + th { border-left: 1px solid var(--border); }
+.md hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+.md u { text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.j-ok { color: var(--ok); font-weight: 700; } .j-mid { color: var(--mid); font-weight: 700; } .j-ng { color: var(--ng); font-weight: 700; }
+footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; padding: 20px 0 40px; }
+.err { color: var(--ng); }
+@media (max-width: 560px) {
+  .panel { padding: 16px 14px; }
+  h1.page { font-size: 1.25rem; }
+  .brand small { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#/">SC午後 過去問解説<small>情報処理安全確保支援士</small></a>
+  <span class="spacer"></span>
+  <button class="iconbtn" id="themeBtn" title="表示テーマ切替" aria-label="表示テーマ切替">🌓</button>
+</div></header>
+<main><div class="wrap" id="app"><p class="sub">読み込み中…</p></div></main>
+<footer><div class="wrap">
+  出典：独立行政法人情報処理推進機構（IPA）「情報処理安全確保支援士試験 午後 問題・解答例」。問題文は画像PDFからの書き起こしで、誤記の可能性があります。正確な内容は<a href="https://www.ipa.go.jp/shiken/mondai-kaiotu/index.html" target="_blank" rel="noopener">IPAの公開資料</a>を確認してください。解答・解説は本サイト独自のもので、IPAの公式見解ではありません。
+</div></footer>
+<script>
+(() => {
+  const $app = document.getElementById("app");
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("sc:" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("sc:" + k, JSON.stringify(v)); } catch {} },
+  };
+  // theme
+  const applyTheme = t => { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; };
+  applyTheme(store.get("theme", null));
+  document.getElementById("themeBtn").onclick = () => {
+    const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+    const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark";
+    applyTheme(next); store.set("theme", next);
+  };
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const cache = {};
+  const load = async path => {
+    if (!(path in cache)) {
+      cache[path] = fetch(path).then(r => { if (!r.ok) throw new Error(path + " (" + r.status + ")"); return r.text(); });
+    }
+    return cache[path];
+  };
+  marked.setOptions({ gfm: true, breaks: false });
+  const render = md => {
+    const html = marked.parse(md)
+      .replace(/<table>/g, '<div class="tbl"><table>').replace(/<\/table>/g, "</table></div>")
+      .replace(/(<td>\s*)(<strong>)?(◎|○)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ok">$3</span>$5')
+      .replace(/(<td>\s*)(<strong>)?(△)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-mid">$3</span>$5')
+      .replace(/(<td>\s*)(<strong>)?(×)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ng">$3</span>$5');
+    return '<div class="md">' + html + "</div>";
+  };
+  // split a markdown file at "## " headings -> { common: [...], q: {1: "...", ...} }
+  const splitSections = md => {
+    const out = { head: "", common: [], q: {} };
+    let cur = null, buf = "";
+    const flush = () => {
+      if (cur === null) out.head += buf;
+      else if (cur.q) out.q[cur.q] = (out.q[cur.q] || "") + buf;
+      else out.common.push(buf);
+      buf = "";
+    };
+    for (const line of md.split(/(?<=\n)/)) {
+      const m = line.match(/^##\s+(.*)/);
+      if (m) { flush(); const qm = m[1].match(/^問\s*(\d)/); cur = qm ? { q: +qm[1] } : { title: m[1] }; }
+      buf += line;
+    }
+    flush();
+    return out;
+  };
+
+  let manifest = null;
+  const doneKey = (e, n) => "done:" + e + ":" + n;
+  const judgeBar = j => {
+    const total = j["◎"] + j["○"] + j["△"] + j["×"];
+    if (!total) return "";
+    const seg = (k, c) => j[k] ? `<i class="${c}" style="width:${(j[k] / total * 100).toFixed(1)}%"></i>` : "";
+    return `<div class="bar" title="◎${j["◎"]} ○${j["○"]} △${j["△"]} ×${j["×"]}">${seg("◎", "j1")}${seg("○", "j2")}${seg("△", "j3")}${seg("×", "j4")}</div>`;
+  };
+
+  function viewHome(filter = "") {
+    const f = filter.trim().toLowerCase();
+    const exams = manifest.exams;
+    let nq = 0, nd = 0, jt = { "◎": 0, "○": 0, "△": 0, "×": 0 };
+    exams.forEach(e => e.questions.forEach(q => { nq++; if (store.get(doneKey(e.id, q.no), false)) nd++; for (const k in jt) jt[k] += q.judge[k]; }));
+    const judged = jt["◎"] + jt["○"] + jt["△"] + jt["×"];
+    const rate = judged ? Math.round((jt["◎"] + jt["○"]) / judged * 100) : 0;
+    let html = `<h1 class="page">情報処理安全確保支援士 午後 過去問解説</h1>
+      <p class="sub">新形式（令和5年度秋期〜）の午後問題を、問題文の書き起こし、<b>答えを見ずに書いた解答と解説</b>、IPA公式解答例との照合の3点セットで掲載しています。</p>
+      <div class="stats">
+        <div class="stat"><b>${exams.length}</b><span>回分</span></div>
+        <div class="stat"><b>${nq}</b><span>問</span></div>
+        <div class="stat"><b>${rate}%</b><span>自作解答が公式と要点一致（◎＋○）</span></div>
+        <div class="stat"><b>${nd} / ${nq}</b><span>あなたが解いた問題</span></div>
+      </div>
+      <input class="search" id="q" type="search" placeholder="テーマや題材で絞り込み（例：JWT、DNS、ログ）" value="${esc(filter)}">
+      <div class="legend"><span><i style="background:var(--ok)"></i>◎一致</span><span><i style="background:color-mix(in srgb,var(--ok) 55%,var(--surface2))"></i>○要点同じ</span><span><i style="background:var(--mid)"></i>△ずれ</span><span><i style="background:var(--ng)"></i>×不一致</span><span>（自作解答と公式解答例の照合結果）</span></div>`;
+    let shown = 0;
+    for (const e of exams) {
+      const qs = e.questions.filter(q => !f || (q.theme + q.lead).toLowerCase().includes(f));
+      if (!qs.length) continue;
+      shown += qs.length;
+      html += `<section class="exam"><div class="exam-h"><h2>${esc(e.label)}</h2><a href="#/${e.id}">回の総括 →</a></div><div class="grid">`;
+      for (const q of qs) {
+        const done = store.get(doneKey(e.id, q.no), false);
+        html += `<a class="card" href="#/${e.id}/${q.no}">${done ? '<span class="done">✓ 解いた</span>' : ""}
+          <div class="qno">問${q.no}</div><div class="theme">${esc(q.theme || "（テーマ不明）")}</div>
+          <div class="lead">${esc(q.lead)}</div>${judgeBar(q.judge)}</a>`;
+      }
+      html += `</div></section>`;
+    }
+    if (!shown) html += `<p class="sub">該当する問題がありません。</p>`;
+    $app.innerHTML = html;
+    const inp = document.getElementById("q");
+    inp.oninput = () => { const pos = inp.selectionStart; viewHome(inp.value); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(pos, pos); };
+  }
+
+  async function viewExam(id) {
+    const e = manifest.exams.find(x => x.id === id);
+    if (!e) return viewNotFound();
+    let html = `<div class="crumbs"><a href="#/">トップ</a> / ${esc(e.label)}</div>
+      <h1 class="page">${esc(e.label)} 午後</h1><p class="sub">問1〜問4から2問選択。</p><div class="grid" style="margin-bottom:22px">`;
+    for (const q of e.questions) html += `<a class="card" href="#/${e.id}/${q.no}"><div class="qno">問${q.no}</div><div class="theme">${esc(q.theme)}</div><div class="lead">${esc(q.lead)}</div>${judgeBar(q.judge)}</a>`;
+    html += `</div>`;
+    $app.innerHTML = html + `<div class="panel"><p class="sub">照合の総括を読み込み中…</p></div>`;
+    try {
+      const sh = splitSections(await load(`${id}/shougou.md`));
+      $app.innerHTML = html + `<div class="panel">${render(sh.head + sh.common.join(""))}</div>
+        <p class="sub" style="margin-top:14px">原本：<a href="../pdf/${id}_sc_pm_qs.pdf">問題PDF</a> ・ <a href="../pdf/${id}_sc_pm_ans.pdf">解答例PDF</a></p>`;
+    } catch (err) {
+      $app.innerHTML = html + `<div class="panel"><p class="sub">照合結果はまだありません。</p></div>`;
+    }
+  }
+
+  async function viewQuestion(id, no, tab) {
+    const e = manifest.exams.find(x => x.id === id);
+    const q = e && e.questions.find(x => x.no === no);
+    if (!q) return viewNotFound();
+    const idx = e.questions.indexOf(q);
+    const prev = e.questions[idx - 1], next = e.questions[idx + 1];
+    const tabs = [["mondai", "問題文"], ["kaisetsu", "解答・解説"], ["shougou", "公式との照合"]];
+    tab = tabs.some(t => t[0] === tab) ? tab : "mondai";
+    const done = store.get(doneKey(id, no), false);
+    $app.innerHTML = `<div class="crumbs"><a href="#/">トップ</a> / <a href="#/${id}">${esc(e.label)}</a> / 問${no}</div>
+      <div class="qhead"><h1 class="page">問${no} ${esc(q.theme)}</h1>
+        <label class="check"><input type="checkbox" id="done" ${done ? "checked" : ""}> 解いた</label></div>
+      <div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${k === tab}" data-tab="${k}">${l}</button>`).join("")}</div>
+      <div class="panel" id="panel"><p class="sub">読み込み中…</p></div>
+      <div class="pager"><span>${prev ? `<a href="#/${id}/${prev.no}">← 問${prev.no} ${esc(prev.theme)}</a>` : ""}</span><span>${next ? `<a href="#/${id}/${next.no}">問${next.no} ${esc(next.theme)} →</a>` : ""}</span></div>`;
+    document.getElementById("done").onchange = ev => store.set(doneKey(id, no), ev.target.checked);
+    $app.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { location.hash = `#/${id}/${no}/${b.dataset.tab}`; });
+    const panel = document.getElementById("panel");
+    const show = async () => {
+      try {
+        if (tab === "mondai") {
+          panel.innerHTML = render(await load(`${id}/mondai_q${no}.md`));
+        } else {
+          const file = tab === "kaisetsu" ? "kaitou_kaisetsu.md" : "shougou.md";
+          const sec = splitSections(await load(`${id}/${file}`)).q[no];
+          panel.innerHTML = sec ? render(sec) : `<p class="sub">まだ用意されていません。</p>`;
+        }
+      } catch (err) { panel.innerHTML = `<p class="err">読み込みに失敗しました：${esc(err.message)}</p>`; }
+    };
+    const revealKey = "reveal:" + id + ":" + no;
+    if (tab !== "mondai" && !store.get(revealKey, false)) {
+      panel.innerHTML = `<div class="gate"><p>先に自分で解いてみましょう。<br>答えを表示すると、この問題では次回から確認なしで表示します。</p>
+        <button class="btn" id="reveal">答えを表示する</button></div>`;
+      document.getElementById("reveal").onclick = () => { store.set(revealKey, true); show(); };
+    } else show();
+    window.scrollTo(0, 0);
+  }
+
+  function viewNotFound() { $app.innerHTML = `<p class="sub">ページが見つかりません。<a href="#/">トップへ</a></p>`; }
+
+  function route() {
+    const [, id, no, tab] = location.hash.replace(/^#/, "").split("/");
+    if (!id) return viewHome();
+    if (!no) return viewExam(id);
+    return viewQuestion(id, +no, tab);
+  }
+
+  fetch("manifest.json").then(r => r.json()).then(m => { manifest = m; window.addEventListener("hashchange", route); route(); })
+    .catch(err => { $app.innerHTML = `<p class="err">manifest.json を読み込めませんでした：${esc(err.message)}</p>`; });
+})();
+</script>
+</body>
+</html>
