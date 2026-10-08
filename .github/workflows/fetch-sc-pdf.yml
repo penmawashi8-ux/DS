@@ -14,18 +14,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download PDFs from IPA
+      - name: Crawl IPA past-exam pages for SC afternoon PDFs
         run: |
-          mkdir -p pdf
-          base=https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att
-          for f in 2024r06h_sc_pm_qs.pdf 2024r06h_sc_pm_ans.pdf; do
-            curl -fsSL --retry 3 -A "Mozilla/5.0" -o "pdf/$f" "$base/$f"
-            file "pdf/$f"
-          done
+          set -u
+          mkdir -p pdf crawl
+          UA="Mozilla/5.0"
+          root=https://www.ipa.go.jp/shiken/mondai-kaiotu/
+          curl -fsSL -A "$UA" "$root" -o crawl/index.html || true
+          # candidate pages: everything under /shiken/mondai-kaiotu/ linked from the index
+          grep -oE 'href="[^"]*"' crawl/index.html | sed 's/^href="//;s/"$//' \
+            | grep -E 'mondai-kaiotu/|^[^/:]+\.html$' | sort -u > crawl/pages.txt || true
+          : > crawl/pdfs.txt
+          grep -oE '[^"]*_sc_pm[^"]*\.pdf' crawl/index.html >> crawl/pdfs.txt || true
+          n=0
+          while read -r p; do
+            case "$p" in
+              http*) u="$p" ;;
+              /*) u="https://www.ipa.go.jp$p" ;;
+              *) u="$root$p" ;;
+            esac
+            case "$u" in *.pdf) continue ;; esac
+            n=$((n+1)); [ $n -gt 80 ] && break
+            f="crawl/page_$n.html"
+            curl -fsSL -A "$UA" "$u" -o "$f" || continue
+            grep -oE 'href="[^"]*_sc_pm[^"]*\.pdf"' "$f" | sed 's/^href="//;s/"$//' \
+              | while read -r q; do
+                  case "$q" in
+                    http*) echo "$q" ;;
+                    /*) echo "https://www.ipa.go.jp$q" ;;
+                    *) echo "$(dirname "$u")/$q" ;;
+                  esac
+                done >> crawl/pdfs.txt
+          done < crawl/pages.txt
+          sort -u crawl/pdfs.txt -o crawl/pdfs.txt
+          echo "== found PDFs"; cat crawl/pdfs.txt
+          # keep the new single-afternoon format (2023 autumn onwards): *_sc_pm_qs.pdf / *_sc_pm_ans.pdf
+          grep -E '/20(2[3-9])r0[5-9][ah]_sc_pm_(qs|ans)\.pdf$' crawl/pdfs.txt > crawl/targets.txt || true
+          while read -r u; do
+            b=$(basename "$u")
+            [ -f "pdf/$b" ] && continue
+            curl -fsSL --retry 3 -A "$UA" -o "pdf/$b" "$u" && file "pdf/$b"
+          done < crawl/targets.txt
+          cp crawl/pdfs.txt pdf/_found_urls.txt
+          ls -la pdf
       - name: Commit PDFs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pdf
-          git diff --cached --quiet || git commit -m "Add R6 spring SC afternoon exam PDFs from IPA"
+          git diff --cached --quiet || git commit -m "Add SC afternoon exam PDFs (new format) from IPA"
           git push
