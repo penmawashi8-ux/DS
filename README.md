@@ -11,3 +11,10 @@
 - `scripts/build_sc_manifest.py` … `sc/` 配下を走査して `sc/manifest.json` を再生成する
 
 ローカル確認：`python3 -m http.server` をリポジトリ直下で起動し、`http://localhost:8000/sc/` を開く。
+- `eisei/` … 衛生管理者など 安全衛生技術試験協会の公表試験問題の解説（note 販売の試作）
+  - `eisei/pdf/` … 協会公開の公表問題PDF（`.github/workflows/fetch-eisei-pdf.yml` で取得。開発環境からは exam.or.jp に届かないため）
+  - `eisei/<回ID>/mondai.md` … 問題文の書き起こし（PDFの文字データが崩れているため画像から）
+  - `eisei/<回ID>/kaitou_kaisetsu.md` … 公式正答を見る前に作成した解答と、選択肢ごとの解説
+  - `eisei/<回ID>/seitou.json` / `shougou.md` … 公式正答（PDF内の○）と、自作解答との照合結果
+  - `eisei/<回ID>/note_draft.md` … note に貼る下書き（無料部分＋有料部分）
+  - 手順：`scripts/eisei_prepare.py`（正答抽出＋○を白塗りした画像作成）→ 画像を見て解答・解説作成 → `scripts/eisei_shougou.py`（照合）→ `scripts/eisei_note.py`（下書き生成）
