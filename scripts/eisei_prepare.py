@@ -34,7 +34,7 @@ def main():
             continue
         x0, y0, x1, y1, text = float(m[1]), float(m[2]), float(m[3]), float(m[4]), m[5]
         cm = CHOICE_RE.match(text)
-        if not cm or x0 > 100:  # 行頭の選択肢番号だけを見る
+        if not cm or x0 > 150:  # 行頭の選択肢番号だけを見る（PDFによって左余白が違う）
             continue
         n = ZEN.index(cm[2]) + 1
         if n == 1 and last_choice != 1:
