@@ -58,10 +58,11 @@ def main():
         for u, text in links(url, html):
             if "exam.or.jp" not in u:
                 continue
-            if u.lower().endswith(".pdf"):
+            # 協会ページには拡張子 .pdf が抜けたリンク（例：LC20260414-1）もあるので LC 番号でも判定する
+            if u.lower().endswith(".pdf") or re.search(r"/LC\d+[-\d]*$", u):
                 # 免許試験の公表問題（LC*.pdf）のうち ISSUES の掲載回を取る。
                 # リンク文字列は掲載日だけなので、試験種別は後で中身から判別する
-                if re.search(r"/LC\d+[-\d]*\.pdf$", u) and any(i in text for i in ISSUES):
+                if re.search(r"/LC\d+[-\d]*(\.pdf)?$", u) and any(i in text for i in ISSUES):
                     pdfs[u] = text
                 log.append(f"  PDF {u} [{text}]")
             elif ("kohyo" in u.lower() or "公表" in text) and u not in seen:
@@ -73,6 +74,8 @@ def main():
 
     for u, text in sorted(pdfs.items()):
         name = Path(urllib.parse.urlparse(u).path).name
+        if not name.lower().endswith(".pdf"):
+            name += ".pdf"
         dst = OUT / name
         if dst.exists():
             continue
