@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = "https://www.exam.or.jp/"
 OUT = Path(__file__).resolve().parent.parent / "eisei" / "pdf"
 UA = {"User-Agent": "Mozilla/5.0"}
-LATEST = "令和8年10月"
+ISSUES = ("令和8年10月", "令和8年4月")  # 取得する掲載回（リンク文字列と照合）
 LINK_RE = re.compile(r'<a\s[^>]*href="([^"]+)"[^>]*>(.*?)</a>', re.I | re.S)
 TAG_RE = re.compile(r"<[^>]+>")
 
@@ -59,9 +59,9 @@ def main():
             if "exam.or.jp" not in u:
                 continue
             if u.lower().endswith(".pdf"):
-                # 免許試験の公表問題（LC*.pdf）のうち最新掲載分を取る。
+                # 免許試験の公表問題（LC*.pdf）のうち ISSUES の掲載回を取る。
                 # リンク文字列は掲載日だけなので、試験種別は後で中身から判別する
-                if re.search(r"/LC\d+[-\d]*\.pdf$", u) and LATEST in text:
+                if re.search(r"/LC\d+[-\d]*\.pdf$", u) and any(i in text for i in ISSUES):
                     pdfs[u] = text
                 log.append(f"  PDF {u} [{text}]")
             elif ("kohyo" in u.lower() or "公表" in text) and u not in seen:
