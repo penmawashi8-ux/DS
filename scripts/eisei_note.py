@@ -94,7 +94,7 @@ def main():
     d = Path(__file__).resolve().parent.parent / "eisei" / exam_id
     mondai = (d / "mondai.md").read_text(encoding="utf-8")
     kaisetsu = (d / "kaitou_kaisetsu.md").read_text(encoding="utf-8")
-    source = "\n".join(l for l in mondai.splitlines()[:5] if l.startswith(">") and "書き起こし" not in l)
+    source = "\n".join(l for l in mondai.splitlines()[:5] if l.startswith(">") and "書き起こし" not in l).replace("対応していない。", "対応していません。")
     qs, ks = split(mondai), split(kaisetsu)
 
     out = [
