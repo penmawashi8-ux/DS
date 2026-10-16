@@ -18,4 +18,5 @@
   - `eisei/<回ID>/seitou.json` / `shougou.md` … 公式正答（PDF内の○）と、自作解答との照合結果
   - `eisei/<回ID>/note_draft.md` … note に貼る下書き（無料部分＋有料部分）
   - `eisei/<回ID>/header.png` … note の見出し画像（1280×670、`scripts/eisei_header.py` で生成）
+  - `eisei/pdf/` の取得対象回は `scripts/fetch_eisei.py` の `ISSUES` で指定
   - 手順：`scripts/eisei_prepare.py`（正答抽出＋○を白塗りした画像作成）→ 画像を見て解答・解説作成 → `scripts/eisei_shougou.py`（照合）→ `scripts/eisei_note.py`（下書き生成）→ `scripts/eisei_header.py`（見出し画像）
