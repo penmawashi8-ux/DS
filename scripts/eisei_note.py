@@ -94,11 +94,12 @@ def main():
     d = Path(__file__).resolve().parent.parent / "eisei" / exam_id
     mondai = (d / "mondai.md").read_text(encoding="utf-8")
     kaisetsu = (d / "kaitou_kaisetsu.md").read_text(encoding="utf-8")
-    source = "\n".join(l for l in mondai.splitlines()[:5] if l.startswith(">") and "書き起こし" not in l).replace("対応していない。", "対応していません。")
+    exam = mondai.splitlines()[0].lstrip("# ").split()[0]  # 例：第二種衛生管理者
+    source = "\n".join(l for l in mondai.splitlines()[:8] if l.startswith(">") and "書き起こし" not in l).replace("対応していない。", "対応していません。")
     qs, ks = split(mondai), split(kaisetsu)
 
     out = [
-        "安全衛生技術試験協会が公表している第二種衛生管理者試験の問題を、1問ずつ"
+        f"安全衛生技術試験協会が公表している{exam}試験の問題を、1問ずつ"
         "「どこが誤りか」「正しくは何か」まで、すべての選択肢について解説します。",
         "",
         source,
@@ -108,9 +109,12 @@ def main():
     ]
     for q in sorted(qs):
         title, _, body = ks[q].partition("\n")
-        out += [f"## 問{q}　{title.split('―')[0].strip()}", "", for_note(qs[q]), "",
-                "### 解答と解説", "",
-                f"**解答：{title.split('解答')[-1].strip()}**", "", body.strip(), ""]
+        shared = re.search(r"（(第[一二]種 問\d+) と同一問題）", title)
+        answer = re.search(r"解答\s*(.+?)(?:（第[一二]種|$)", title)[1].strip()
+        out += [f"## 問{q}　{title.split('―')[0].strip()}", ""]
+        if shared:
+            out += [f"※ {shared[1]}と共通の問題です。", ""]
+        out += [for_note(qs[q]), "", "### 解答と解説", "", f"**解答：{answer}**", "", body.strip(), ""]
         if q == free:
             out += ["---", "", PAY_MARK, "", "---", ""]
     out += ["---", "",
