@@ -23,7 +23,7 @@ def answers_from_pdf(exam_id):
     if not pdf.exists():
         return {}
     text = subprocess.run(["pdftotext", "-layout", str(pdf), "-"],
-                          capture_output=True, text=True).stdout
+                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True).stdout
     return {int(n): a for n, a in re.findall(r"問\s*(\d+)\s+([アイウエ])", text)}
 
 
