@@ -2,9 +2,14 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SC午前II 道場</title>
 <meta name="description" content="情報処理安全確保支援士試験 午前IIの過去問とオリジナル新規問題を混ぜて出題する模擬試験・一問一答">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141b" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SC午前II">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="../vendor/marked.min.js"></script>
@@ -15,6 +20,7 @@
   --text: #1c2430; --muted: #5d6b7a; --accent: #1f6feb; --accent-weak: #e3edff;
   --ok: #1a7f37; --ok-weak: #dcf5e3; --mid: #9a6700; --mid-weak: #fff3cd;
   --ng: #cf222e; --ng-weak: #ffe2e0; --code-bg: #f1f3f6; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+  --bar-h: 58px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -31,114 +37,173 @@
   --ng: #f85149; --ng-weak: #3b1513; --code-bg: #1b222d; --shadow: none;
 }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.75; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.6; -webkit-tap-highlight-color: transparent; }
+button, .chip, .seg label { touch-action: manipulation; }
 a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
-.wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
-header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
-header.top .wrap { display: flex; align-items: center; gap: 10px; height: 56px; }
-.brand { font-weight: 700; color: var(--text); white-space: nowrap; cursor: pointer; }
-.brand small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+
+/* ヘッダー */
+header.top { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding-top: env(safe-area-inset-top); }
+header.top .wrap { display: flex; align-items: center; gap: 8px; height: 46px; }
+.brand { font-weight: 700; color: var(--text); white-space: nowrap; cursor: pointer; font-size: 1.02rem; }
+.hd-prog { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .spacer { flex: 1; }
-.timer { font-family: "JetBrains Mono", monospace; font-weight: 500; padding: 2px 10px; border-radius: 8px; background: var(--surface2); }
+.timer { font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: .95rem; padding: 2px 10px; border-radius: 8px; background: var(--surface2); font-variant-numeric: tabular-nums; }
 .timer.low { background: var(--ng-weak); color: var(--ng); }
-.iconbtn { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px; height: 34px; min-width: 34px; cursor: pointer; font-size: 15px; }
-main { padding: 24px 0 72px; }
-h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
-h2.sec { font-size: 1.05rem; margin: 28px 0 10px; }
-.sub { color: var(--muted); margin: 0 0 20px; font-size: .92rem; }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 8px; }
-.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
-.stat b { display: block; font-size: 1.4rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
-.stat span { color: var(--muted); font-size: .8rem; }
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); margin-bottom: 14px; }
-.panel h3 { margin: 0 0 4px; font-size: 1.05rem; }
-.panel p { margin: 0 0 12px; color: var(--muted); font-size: .9rem; }
-.row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 12px; font-size: .92rem; }
-.row label { display: inline-flex; align-items: center; gap: 6px; }
-select, input[type=number] { font: inherit; padding: 4px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
-input[type=range] { width: 160px; }
-.btn { font: inherit; font-weight: 500; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: 8px 16px; cursor: pointer; }
-.btn:hover { border-color: var(--accent); }
+.iconbtn { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 10px; height: 36px; min-width: 36px; padding: 0 10px; cursor: pointer; font: inherit; font-size: .95rem; }
+.progress { height: 3px; background: var(--surface2); }
+.progress i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+
+main { padding: 12px 0 24px; }
+body.in-session main { padding-bottom: calc(var(--bar-h) + 12px + env(safe-area-inset-bottom)); }
+body.in-session footer { display: none; }
+h1.page { font-size: 1.35rem; margin: 0 0 4px; line-height: 1.4; }
+h2.sec { font-size: 1rem; margin: 26px 0 10px; color: var(--muted); font-weight: 700; }
+.sub { color: var(--muted); margin: 0 0 16px; font-size: .9rem; line-height: 1.65; }
+
+/* ホーム */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; box-shadow: var(--shadow); }
+.stat b { display: block; font-size: 1.35rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: .75rem; line-height: 1.4; display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; box-shadow: var(--shadow); margin-bottom: 12px; }
+.card h3 { margin: 0 0 2px; font-size: 1.1rem; }
+.card > p { margin: 0 0 10px; color: var(--muted); font-size: .88rem; line-height: 1.6; }
+.field { margin-bottom: 10px; }
+.field > .lbl { display: flex; justify-content: space-between; align-items: baseline; font-size: .85rem; color: var(--muted); margin-bottom: 6px; gap: 8px; }
+.field > .lbl b { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+.seg { display: flex; background: var(--surface2); border-radius: 12px; padding: 3px; gap: 3px; }
+.seg label { flex: 1; text-align: center; cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; padding: 8px 4px; border-radius: 9px; font-size: .9rem; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.seg input:checked + span { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); }
+input[type=range] { width: 100%; height: 32px; accent-color: var(--accent); margin: 0; }
+.btn { font: inherit; font-weight: 700; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 12px; min-height: 46px; padding: 10px 16px; cursor: pointer; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.primary:hover { filter: brightness(1.08); }
-.btn:disabled { opacity: .45; cursor: default; }
+.btn.block { display: block; width: 100%; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn + .btn.block { margin-top: 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-size: .82rem; padding: 2px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface2); cursor: pointer; user-select: none; }
-.chip.on { background: var(--accent-weak); border-color: var(--accent); color: var(--accent); }
-.tag { display: inline-block; font-size: .75rem; padding: 1px 8px; border-radius: 999px; background: var(--surface2); color: var(--muted); margin-right: 6px; }
+.chip { font-size: .8rem; min-height: 32px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); cursor: pointer; user-select: none; display: inline-flex; align-items: center; color: var(--muted); }
+.chip.on { background: var(--accent-weak); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+.linkbtn { background: none; border: none; color: var(--accent); font: inherit; font-size: .82rem; cursor: pointer; padding: 4px 0; }
+.hist { list-style: none; margin: 0; padding: 0; }
+.hist li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .88rem; }
+.hist li:last-child { border-bottom: none; }
+.hist .pct { font-weight: 700; font-size: 1.05rem; min-width: 3.4em; font-variant-numeric: tabular-nums; }
+.hist .pct.ok { color: var(--ok); } .hist .pct.ng { color: var(--ng); }
+.hist .meta { color: var(--muted); font-size: .8rem; line-height: 1.5; }
+
+.tabs { display: flex; background: var(--surface2); border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+.tabs button { flex: 1; font: inherit; font-size: .92rem; font-weight: 700; color: var(--muted); background: none; border: none; border-radius: 9px; padding: 8px 4px; cursor: pointer; }
+.tabs button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+details.range { border: 1px solid var(--border); border-radius: 12px; padding: 0 12px; margin-bottom: 12px; }
+details.range > summary { display: flex; justify-content: space-between; align-items: center; min-height: 44px; cursor: pointer; font-size: .88rem; color: var(--muted); list-style: none; }
+details.range > summary::-webkit-details-marker { display: none; }
+details.range > summary::after { content: "▾"; margin-left: 8px; }
+details.range[open] > summary::after { content: "▴"; }
+details.range > summary b { color: var(--text); margin-left: auto; }
+/* 問題 */
+.tag { display: inline-block; font-size: .75rem; padding: 1px 8px; border-radius: 999px; background: var(--surface2); color: var(--muted); white-space: nowrap; }
 .tag.past { background: var(--accent-weak); color: var(--accent); }
 .tag.orig { background: var(--mid-weak); color: var(--mid); }
-.qhead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; color: var(--muted); font-size: .88rem; }
-.qtext { font-size: 1.02rem; margin-bottom: 14px; }
-.qtext p { margin: 0 0 10px; }
-.qtext table { border-collapse: collapse; margin: 8px 0 12px; font-size: .92rem; display: block; overflow-x: auto; }
-.qtext th, .qtext td { border: 1px solid var(--border); padding: 4px 10px; }
+.qmeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.qtext { font-size: .98rem; line-height: 1.7; margin-bottom: 10px; overflow-wrap: anywhere; }
+.qtext p { margin: 0 0 6px; }
+.qtext table { border-collapse: collapse; margin: 8px 0 12px; font-size: .88rem; display: block; overflow-x: auto; max-width: 100%; line-height: 1.5; }
+.qtext th, .qtext td { border: 1px solid var(--border); padding: 5px 8px; }
 .qtext th { background: var(--surface2); }
-.qtext pre { background: var(--code-bg); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-family: "JetBrains Mono", monospace; font-size: .85rem; }
-.qtext ul { margin: 0 0 10px; padding-left: 1.4em; }
-.choices { display: grid; gap: 8px; }
-.choice { display: flex; gap: 10px; align-items: flex-start; text-align: left; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; line-height: 1.6; }
-.choice:hover { border-color: var(--accent); }
-.choice .k { flex: none; font-weight: 700; width: 1.6em; height: 1.6em; display: grid; place-items: center; border-radius: 6px; background: var(--surface2); }
+.qtext pre { background: var(--code-bg); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-family: "JetBrains Mono", monospace; font-size: .8rem; line-height: 1.6; }
+.qtext ul, .qtext ol { margin: 0 0 10px; padding-left: 1.3em; }
+.choices { display: grid; gap: 7px; }
+.choice { display: flex; gap: 10px; align-items: flex-start; text-align: left; font: inherit; font-size: .92rem; color: var(--text); background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 9px 11px; min-height: 46px; cursor: pointer; line-height: 1.55; width: 100%; overflow-wrap: anywhere; }
+.choice .k { flex: none; font-weight: 700; width: 26px; height: 26px; font-size: .9rem; display: grid; place-items: center; border-radius: 8px; background: var(--surface2); margin-top: -1px; }
 .choice.sel { border-color: var(--accent); background: var(--accent-weak); }
 .choice.sel .k { background: var(--accent); color: #fff; }
 .choice.correct { border-color: var(--ok); background: var(--ok-weak); }
 .choice.correct .k { background: var(--ok); color: #fff; }
 .choice.wrong { border-color: var(--ng); background: var(--ng-weak); }
 .choice.wrong .k { background: var(--ng); color: #fff; }
-.choice[disabled] { cursor: default; }
-.navbar { display: flex; gap: 8px; justify-content: space-between; align-items: center; margin-top: 16px; flex-wrap: wrap; }
-.qgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; margin: 16px 0 0; }
-.qgrid button { font: inherit; font-size: .85rem; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; position: relative; font-variant-numeric: tabular-nums; }
-.qgrid button.ans { background: var(--accent-weak); border-color: var(--accent); }
-.qgrid button.cur { outline: 2px solid var(--accent); outline-offset: 1px; }
-.qgrid button.flag::after { content: ""; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--mid); }
-.qgrid button.ok { background: var(--ok-weak); border-color: var(--ok); }
-.qgrid button.ng { background: var(--ng-weak); border-color: var(--ng); }
-.feedback { margin-top: 14px; border-radius: 10px; padding: 12px 14px; border: 1px solid var(--border); background: var(--surface2); }
+.choice[disabled] { cursor: default; color: var(--text); }
+@media (hover: hover) { .choice:not([disabled]):hover, .btn:not(:disabled):hover, .chip:hover { border-color: var(--accent); } }
+.feedback { margin-top: 10px; border-radius: 12px; padding: 10px 12px; border: 1.5px solid var(--border); background: var(--surface); scroll-margin-top: 70px; scroll-margin-bottom: calc(var(--bar-h) + 20px); }
 .feedback.ok { border-color: var(--ok); }
 .feedback.ng { border-color: var(--ng); }
-.feedback b.ok { color: var(--ok); }
-.feedback b.ng { color: var(--ng); }
-.feedback .exp { margin-top: 6px; font-size: .93rem; }
-.feedback .src { margin-top: 6px; font-size: .8rem; color: var(--muted); }
-.score { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.score .big { font-size: 2.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
-.pass { font-weight: 700; padding: 2px 12px; border-radius: 999px; }
+.feedback .verdict { font-size: 1rem; font-weight: 700; }
+.feedback .verdict.ok { color: var(--ok); }
+.feedback .verdict.ng { color: var(--ng); }
+.feedback .exp { margin-top: 4px; font-size: .9rem; line-height: 1.65; }
+.feedback .src { margin-top: 4px; font-size: .8rem; color: var(--muted); }
+
+/* 下部固定バー */
+.actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
+.actionbar .wrap { display: flex; gap: 8px; align-items: center; height: var(--bar-h); }
+.actionbar .btn { min-height: 44px; padding: 8px 12px; }
+.actionbar .grow { flex: 1; }
+.actionbar .hint { flex: 1; text-align: center; color: var(--muted); font-size: .85rem; }
+.btn.icon { min-width: 52px; padding: 8px; font-size: 1.05rem; }
+.btn.flag-on { color: var(--mid); border-color: var(--mid); background: var(--mid-weak); }
+
+/* 問題一覧シート */
+.sheet-bg { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.35); }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--surface); border-radius: 18px 18px 0 0; padding: 10px 0 calc(16px + env(safe-area-inset-bottom)); max-height: 80vh; overflow-y: auto; box-shadow: 0 -4px 20px rgba(0,0,0,.2); }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--border); margin: 0 auto 10px; }
+.sheet h3 { margin: 0 0 4px; font-size: 1rem; }
+.sheet .legend { color: var(--muted); font-size: .8rem; margin-bottom: 12px; }
+.qgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+.qgrid button { font: inherit; font-size: .95rem; height: 46px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; position: relative; font-variant-numeric: tabular-nums; }
+.qgrid button.ans { background: var(--accent-weak); border-color: var(--accent); }
+.qgrid button.cur { outline: 2.5px solid var(--accent); outline-offset: 1px; }
+.qgrid button.flag::after { content: "★"; position: absolute; top: 0; right: 4px; font-size: .7rem; color: var(--mid); }
+.qgrid button.ok { background: var(--ok-weak); border-color: var(--ok); }
+.qgrid button.ng { background: var(--ng-weak); border-color: var(--ng); }
+
+/* 結果 */
+.score { text-align: center; padding: 6px 0 4px; }
+.score .big { font-size: 2.6rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.score .big small { font-size: 1.1rem; color: var(--muted); font-weight: 500; }
+.score .pass { display: inline-block; margin-top: 6px; font-weight: 700; padding: 3px 14px; border-radius: 999px; font-size: .9rem; }
 .pass.ok { background: var(--ok-weak); color: var(--ok); }
 .pass.ng { background: var(--ng-weak); color: var(--ng); }
+.kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; text-align: center; }
+.kv div { background: var(--surface2); border-radius: 10px; padding: 8px 4px; }
+.kv b { display: block; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.kv span { font-size: .75rem; color: var(--muted); }
+.catrow { margin-bottom: 10px; font-size: .88rem; }
+.catrow .h { display: flex; justify-content: space-between; }
 .bar { height: 8px; border-radius: 999px; background: var(--surface2); overflow: hidden; margin-top: 4px; }
 .bar i { display: block; height: 100%; background: var(--accent); }
-table.list { width: 100%; border-collapse: collapse; font-size: .88rem; }
-table.list th, table.list td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
-table.list th { color: var(--muted); font-weight: 500; }
 .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mark-ok { color: var(--ok); font-weight: 700; }
 .mark-ng { color: var(--ng); font-weight: 700; }
-details.rev { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; }
-details.rev > summary { cursor: pointer; padding: 8px 12px; list-style: none; display: flex; gap: 8px; align-items: baseline; }
+.filters { display: flex; gap: 6px; margin-bottom: 10px; }
+details.rev { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin-bottom: 8px; }
+details.rev > summary { cursor: pointer; padding: 8px 12px; list-style: none; display: flex; gap: 8px; align-items: center; min-height: 44px; }
 details.rev > summary::-webkit-details-marker { display: none; }
-details.rev .body { padding: 0 14px 12px; }
-.ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
-footer { color: var(--muted); font-size: .8rem; border-top: 1px solid var(--border); padding: 16px 0 32px; }
+details.rev[open] > summary { border-bottom: 1px solid var(--border); }
+details.rev .body { padding: 12px; }
+.ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; font-size: .9rem; }
+
+footer { color: var(--muted); font-size: .78rem; line-height: 1.7; border-top: 1px solid var(--border); padding: 16px 0 calc(28px + env(safe-area-inset-bottom)); }
 .muted { color: var(--muted); }
 .small { font-size: .85rem; }
-@media (max-width: 560px) {
-  .brand small { display: none; }
-  h1.page { font-size: 1.25rem; }
-  .btn { padding: 8px 12px; }
+@media (max-width: 520px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 721px) {
+  main { padding-top: 28px; }
 }
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap">
-  <span class="brand" id="home">SC午前II 道場<small>情報処理安全確保支援士</small></span>
-  <span class="spacer"></span>
-  <span class="timer" id="timer" hidden></span>
-  <button class="iconbtn" id="theme" title="表示テーマ切替" aria-label="表示テーマ切替">🌓</button>
-</div></header>
+<header class="top">
+  <div class="wrap" id="hd"></div>
+  <div class="progress" id="progress" hidden><i></i></div>
+</header>
 <main class="wrap" id="app"><p class="muted">読み込み中…</p></main>
+<nav class="actionbar" id="bar" hidden><div class="wrap" id="barIn"></div></nav>
+<div id="sheet"></div>
 <footer class="wrap">
   過去問の出典：独立行政法人情報処理推進機構（IPA）情報処理安全確保支援士試験 午前II 問題・解答例（問題文はIPA公開PDFから書き起こし）。
   解説とオリジナル新規問題は本サイト独自のもので，IPAの公式見解ではありません。
@@ -148,11 +213,17 @@ footer { color: var(--muted); font-size: .8rem; border-top: 1px solid var(--bord
 "use strict";
 const KANA = ["ア", "イ", "ウ", "エ"];
 const STORE = "sc-am2-v1";
+const DEF_OPT = { ratio: 60, count: 25, minutes: 40 };   // minutes: 0 = 制限なし
 const $app = document.getElementById("app");
-const $timer = document.getElementById("timer");
+const $hd = document.getElementById("hd");
+const $bar = document.getElementById("bar");
+const $barIn = document.getElementById("barIn");
+const $sheet = document.getElementById("sheet");
+const $prog = document.getElementById("progress");
 let BANK = null, ALL = [], BYID = {};
 let session = null;   // 進行中の模試 / 道場
 let tick = null;
+let homeTab = "mock";
 
 // ---------- 保存 ----------
 function load() {
@@ -164,107 +235,143 @@ function record(id, ok) {
   const s = db.q[id] || (db.q[id] = { n: 0, ok: 0, last: null });
   s.n++; if (ok) s.ok++; s.last = ok ? 1 : 0;
 }
+function opts() {
+  const o = Object.assign({}, DEF_OPT, db.opt);
+  if (o.timed === false) o.minutes = 0;   // 旧形式の設定
+  return o;
+}
 
 // ---------- ユーティリティ ----------
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const md = s => marked.parse(s);
+const $ = id => document.getElementById(id);
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 const isPast = q => q.exam !== "original";
 const cats = () => [...new Set(ALL.map(q => q.cat))];
 function fmtTime(sec) { const m = Math.floor(sec / 60), s = sec % 60; return `${m}:${String(s).padStart(2, "0")}`; }
-function stopTimer() { clearInterval(tick); tick = null; $timer.hidden = true; }
+function stopTimer() { clearInterval(tick); tick = null; }
 function srcTag(q) { return isPast(q) ? `<span class="tag past">過去問</span>` : `<span class="tag orig">新規</span>`; }
 function pdfLink(q) { return q.pdf ? ` <a href="../../pdf/am2/${q.pdf}" target="_blank" rel="noopener">原本PDF</a>` : ""; }
+function choiceBtn(c, k, cls, disabled) {
+  return `<button class="choice ${cls}" data-k="${k}" ${disabled ? "disabled" : ""}><span class="k">${KANA[k]}</span><span>${esc(c)}</span></button>`;
+}
+function toTop() { window.scrollTo(0, 0); }
+
+// ヘッダー・下部バー・進捗バーを画面ごとに切り替える
+function chrome({ header, bar, progress }) {
+  $hd.innerHTML = header;
+  const th = $hd.querySelector("#theme"); if (th) th.onclick = toggleTheme;
+  $bar.hidden = !bar; $barIn.innerHTML = bar || "";
+  document.body.classList.toggle("in-session", !!bar);
+  $prog.hidden = progress == null;
+  if (progress != null) $prog.firstChild.style.width = (progress * 100) + "%";
+}
+const themeBtn = `<button class="iconbtn" id="theme" title="表示テーマ切替" aria-label="表示テーマ切替">🌓</button>`;
+function closeSheet() { $sheet.innerHTML = ""; }
 
 // ---------- ホーム ----------
+function seg(name, values, cur, fmt) {
+  return `<div class="seg">${values.map(v => `<label><input type="radio" name="${name}" value="${v}" ${v == cur ? "checked" : ""}><span>${fmt(v)}</span></label>`).join("")}</div>`;
+}
 function renderHome() {
-  stopTimer(); session = null;
-  const o = Object.assign({ ratio: 60, count: 25, minutes: 40, timed: true }, db.opt);
+  stopTimer(); session = null; closeSheet();
+  chrome({ header: `<span class="brand" id="home">SC午前II 道場</span><span class="spacer"></span>${themeBtn}` });
+  const o = opts();
   const seen = Object.keys(db.q).length;
   const wrong = Object.entries(db.q).filter(([id, s]) => s.last === 0 && BYID[id]).length;
   const best = db.mocks.length ? Math.max(...db.mocks.map(m => Math.round(m.ok / m.n * 100))) : null;
-  const examChips = BANK.exams.map(e => `<span class="chip on" data-exam="${e.id}">${esc(e.label)}</span>`).join("")
-    + `<span class="chip on" data-exam="original">オリジナル新規</span>`;
+  const examChips = BANK.exams.map(e => `<span class="chip on" data-exam="${e.id}">${esc(e.label.replace("年度 ", ""))}</span>`).join("")
+    + `<span class="chip on" data-exam="original">新規問題</span>`;
   const catChips = cats().map(c => `<span class="chip on" data-cat="${esc(c)}">${esc(c)}</span>`).join("");
+  const tab = homeTab;
+  const hist = db.mocks.slice(-10).reverse().map(m => {
+    const p = Math.round(m.ok / m.n * 100);
+    return `<li><span class="pct ${p >= 60 ? "ok" : "ng"}">${p}%</span><div><div>${m.ok}/${m.n}問正解</div><div class="meta">${esc(m.at)}・過去問 ${m.pOk}/${m.pN}・新規 ${m.oOk}/${m.oN}・${fmtTime(m.sec)}</div></div></li>`;
+  }).join("");
   $app.innerHTML = `
-    <h1 class="page">SC午前II 道場</h1>
-    <p class="sub">過去問 ${BANK.past.length}問（${BANK.exams.length}回分）＋オリジナル新規問題 ${BANK.original.length}問。本番と同じ25問・40分・4択で，過去問と新規問題を指定した割合で混ぜて出題します。</p>
-    <div class="stats">
-      <div class="stat"><b>${seen}</b><span>解いた問題（重複なし）</span></div>
-      <div class="stat"><b>${db.mocks.length}</b><span>模擬試験の受験回数</span></div>
-      <div class="stat"><b>${best === null ? "—" : best + "%"}</b><span>模擬試験の最高得点</span></div>
-      <div class="stat"><b>${wrong}</b><span>直近で間違えた問題</span></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="mock" class="${tab === "mock" ? "on" : ""}">模擬試験</button>
+      <button role="tab" data-tab="dojo" class="${tab === "dojo" ? "on" : ""}">一問一答</button>
+      <button role="tab" data-tab="rec" class="${tab === "rec" ? "on" : ""}">記録</button>
     </div>
 
-    <h2 class="sec">模擬試験</h2>
-    <div class="panel">
-      <h3>本番形式で解く</h3>
-      <p>過去問からランダム抽出した問題と新規問題を混ぜて出題し，最後にまとめて採点します。合格基準は本番と同じ60%です。</p>
-      <div class="row">
-        <label>過去問の割合 <input type="range" id="ratio" min="0" max="100" step="10" value="${o.ratio}"></label>
-        <b id="ratioV" class="num"></b>
+    <div class="card" data-pane="mock" ${tab === "mock" ? "" : "hidden"}>
+      <p>過去問 ${BANK.past.length}問（${BANK.exams.length}回分）＋新規 ${BANK.original.length}問から出題。最後にまとめて採点し，合格ラインは60%です。</p>
+      <div class="field">
+        <div class="lbl"><span>過去問の割合</span><b id="ratioV"></b></div>
+        <input type="range" id="ratio" min="0" max="100" step="10" value="${o.ratio}" aria-label="過去問の割合">
       </div>
-      <div class="row">
-        <label>問題数 <select id="count">${[10, 15, 20, 25].map(n => `<option ${n == o.count ? "selected" : ""}>${n}</option>`).join("")}</select></label>
-        <label><input type="checkbox" id="timed" ${o.timed ? "checked" : ""}> 制限時間 <select id="minutes">${[20, 30, 40, 60].map(n => `<option value="${n}" ${n == o.minutes ? "selected" : ""}>${n}分</option>`).join("")}</select></label>
-      </div>
-      <button class="btn primary" id="startMock">模擬試験を開始</button>
+      <div class="field"><div class="lbl"><span>問題数</span></div>${seg("count", [10, 15, 20, 25], o.count, v => v + "問")}</div>
+      <div class="field"><div class="lbl"><span>制限時間</span></div>${seg("minutes", [0, 20, 30, 40], o.minutes, v => v ? v + "分" : "なし")}</div>
+      <button class="btn primary block" id="startMock">模擬試験を始める</button>
     </div>
 
-    <h2 class="sec">一問一答（道場）</h2>
-    <div class="panel">
-      <h3>1問ずつ解いてすぐ答え合わせ</h3>
-      <p>出題範囲を絞って練習できます。チップをクリックすると選択／解除できます。</p>
-      <div class="row small"><span class="muted">回：</span><div class="chips" id="exams">${examChips}</div></div>
-      <div class="row small"><span class="muted">分野：</span><div class="chips" id="cats">${catChips}</div></div>
-      <div class="row">
-        <label>出題順 <select id="order"><option value="rand">ランダム</option><option value="seq">回・問番号順</option><option value="weak">未解答・苦手優先</option></select></label>
-        <span class="muted small" id="poolInfo"></span>
-      </div>
-      <button class="btn primary" id="startDojo">道場を開始</button>
-      <button class="btn" id="startWrong" ${wrong ? "" : "disabled"}>間違えた問題だけ（${wrong}問）</button>
+    <div class="card" data-pane="dojo" ${tab === "dojo" ? "" : "hidden"}>
+      <p>1問ずつ解いて，すぐに正解と解説を確認します。</p>
+      <details class="range">
+        <summary><span>出題範囲</span><b id="rangeV"></b></summary>
+        <div class="field"><div class="lbl"><span>回</span><button class="linkbtn" data-all="exams">すべて切替</button></div><div class="chips" id="exams">${examChips}</div></div>
+        <div class="field"><div class="lbl"><span>分野</span><button class="linkbtn" data-all="cats">すべて切替</button></div><div class="chips" id="cats">${catChips}</div></div>
+      </details>
+      <div class="field"><div class="lbl"><span>出題順</span></div>${seg("order", ["rand", "weak", "seq"], "rand", v => ({ rand: "ランダム", weak: "苦手優先", seq: "順番" })[v])}</div>
+      <button class="btn primary block" id="startDojo"></button>
+      <button class="btn block" id="startWrong" ${wrong ? "" : "disabled"}>間違えた問題だけ（${wrong}問）</button>
     </div>
 
-    ${db.mocks.length ? `<h2 class="sec">模擬試験の履歴</h2>
-    <div class="panel"><table class="list"><thead><tr><th>日時</th><th class="num">得点</th><th class="num">過去問</th><th class="num">新規</th><th class="num">時間</th></tr></thead><tbody>
-      ${db.mocks.slice(-15).reverse().map(m => `<tr><td class="num">${esc(m.at)}</td><td class="num">${m.ok}/${m.n}（${Math.round(m.ok / m.n * 100)}%）</td><td class="num">${m.pOk}/${m.pN}</td><td class="num">${m.oOk}/${m.oN}</td><td class="num">${fmtTime(m.sec)}</td></tr>`).join("")}
-    </tbody></table></div>` : ""}
-
-    <h2 class="sec">データ</h2>
-    <div class="panel small">
-      <p>成績はこのブラウザにだけ保存されます。</p>
-      <button class="btn" id="reset">成績をリセット</button>
+    <div data-pane="rec" ${tab === "rec" ? "" : "hidden"}>
+      <div class="stats">
+        <div class="stat"><b>${seen}</b><span>解いた問題</span></div>
+        <div class="stat"><b>${db.mocks.length}</b><span>模試の回数</span></div>
+        <div class="stat"><b>${best === null ? "—" : best + "%"}</b><span>模試の最高点</span></div>
+        <div class="stat"><b>${wrong}</b><span>要復習</span></div>
+      </div>
+      <div class="card" style="margin-top:10px">${hist ? `<ul class="hist">${hist}</ul>` : `<p class="muted small" style="margin:0">模擬試験の履歴はまだありません。</p>`}</div>
+      <p class="muted small">成績はこのブラウザにだけ保存されます。</p>
+      <button class="btn block" id="reset">成績をリセット</button>
     </div>`;
 
-  const ratio = document.getElementById("ratio"), ratioV = document.getElementById("ratioV"), count = document.getElementById("count");
+  $app.querySelectorAll("[data-tab]").forEach(t => t.onclick = () => {
+    homeTab = t.dataset.tab;
+    $app.querySelectorAll("[data-tab]").forEach(x => x.classList.toggle("on", x === t));
+    $app.querySelectorAll("[data-pane]").forEach(x => x.hidden = x.dataset.pane !== homeTab);
+  });
+  const ratio = $("ratio");
+  const radio = n => +document.querySelector(`input[name=${n}]:checked`).value;
   const showRatio = () => {
-    const n = +count.value, p = Math.round(n * ratio.value / 100);
-    ratioV.textContent = `${ratio.value}%（過去問 ${p}問・新規 ${n - p}問）`;
+    const n = radio("count"), p = Math.round(n * ratio.value / 100);
+    $("ratioV").textContent = `${ratio.value}%（過去問${p}・新規${n - p}）`;
   };
-  ratio.oninput = showRatio; count.onchange = showRatio; showRatio();
-  document.getElementById("startMock").onclick = () => {
-    db.opt = { ratio: +ratio.value, count: +count.value, minutes: +document.getElementById("minutes").value, timed: document.getElementById("timed").checked };
+  ratio.oninput = showRatio;
+  document.querySelectorAll("input[name=count]").forEach(r => r.onchange = showRatio);
+  showRatio();
+  $("startMock").onclick = () => {
+    db.opt = { ratio: +ratio.value, count: radio("count"), minutes: radio("minutes") };
     save(); startMock(db.opt);
   };
-  document.querySelectorAll(".chip").forEach(ch => ch.onclick = () => { ch.classList.toggle("on"); showPool(); });
   const pool = () => {
     const ex = new Set([...document.querySelectorAll("#exams .chip.on")].map(c => c.dataset.exam));
     const ca = new Set([...document.querySelectorAll("#cats .chip.on")].map(c => c.dataset.cat));
     return ALL.filter(q => ex.has(q.exam) && ca.has(q.cat));
   };
-  const showPool = () => { document.getElementById("poolInfo").textContent = `対象 ${pool().length}問`; };
+  const showPool = () => {
+    const n = pool().length, b = $("startDojo");
+    b.textContent = `一問一答を始める（${n}問）`; b.disabled = !n;
+    $("rangeV").textContent = n === ALL.length ? `すべて（${n}問）` : `${n}問`;
+  };
+  document.querySelectorAll(".chip").forEach(ch => ch.onclick = () => { ch.classList.toggle("on"); showPool(); });
+  document.querySelectorAll("[data-all]").forEach(b => b.onclick = () => {
+    const cs = [...document.querySelectorAll(`#${b.dataset.all} .chip`)];
+    const on = !cs.every(c => c.classList.contains("on"));
+    cs.forEach(c => c.classList.toggle("on", on)); showPool();
+  });
   showPool();
-  document.getElementById("startDojo").onclick = () => {
-    const p = pool(); if (!p.length) return alert("出題範囲に問題がありません");
-    startDojo(p, document.getElementById("order").value, "道場");
-  };
-  document.getElementById("startWrong").onclick = () => {
-    startDojo(ALL.filter(q => db.q[q.id] && db.q[q.id].last === 0), "rand", "間違えた問題");
-  };
-  document.getElementById("reset").onclick = () => {
+  $("startDojo").onclick = () => startDojo(pool(), radio("order"), "一問一答");
+  $("startWrong").onclick = () => startDojo(ALL.filter(q => db.q[q.id] && db.q[q.id].last === 0), "rand", "復習");
+  $("reset").onclick = () => {
     if (confirm("解答履歴と模擬試験の記録を全て削除します。よろしいですか？")) { db = { q: {}, mocks: [], opt: db.opt }; save(); renderHome(); }
   };
-  window.scrollTo(0, 0);
+  $("home").onclick = renderHome;
+  toTop();
 }
 
 // ---------- 模擬試験 ----------
@@ -278,50 +385,75 @@ function startMock(o) {
     if (past.length < nPast && !seen.has(k)) { seen.add(k); past.push(q); }
   }
   const qs = shuffle([...past, ...shuffle(BANK.original).slice(0, nOrig)]);
-  session = { kind: "mock", qs, ans: Array(qs.length).fill(null), flag: Array(qs.length).fill(false), i: 0, start: Date.now(), limit: o.timed ? o.minutes * 60 : 0 };
-  $timer.hidden = false;
-  tick = setInterval(updateTimer, 1000); updateTimer();
+  session = { kind: "mock", qs, ans: Array(qs.length).fill(null), flag: Array(qs.length).fill(false), i: 0, start: Date.now(), limit: o.minutes * 60 };
+  tick = setInterval(updateTimer, 1000);
   renderMockQ();
 }
 function updateTimer() {
+  const t = $("timer"); if (!session || session.kind !== "mock" || !t) return;
   const el = Math.floor((Date.now() - session.start) / 1000);
   if (session.limit) {
     const left = session.limit - el;
-    $timer.textContent = "残り " + fmtTime(Math.max(0, left));
-    $timer.classList.toggle("low", left <= 300);
+    t.textContent = fmtTime(Math.max(0, left));
+    t.classList.toggle("low", left <= 300);
     if (left <= 0) { alert("制限時間になりました。採点します。"); finishMock(); }
   } else {
-    $timer.textContent = fmtTime(el); $timer.classList.remove("low");
+    t.textContent = fmtTime(el);
   }
 }
+function quitMock() {
+  if (confirm("模擬試験を中断してホームに戻りますか？（記録されません）")) renderHome();
+}
 function renderMockQ() {
-  const s = session, q = s.qs[s.i];
+  const s = session, q = s.qs[s.i], n = s.qs.length;
   const answered = s.ans.filter(a => a !== null).length;
+  const last = s.i === n - 1;
+  chrome({
+    header: `<button class="iconbtn" id="quit" aria-label="中断">✕</button><span class="hd-prog">問${s.i + 1}<span class="muted" style="font-weight:500"> / ${n}</span></span><span class="spacer"></span><span class="timer" id="timer"></span>${themeBtn}`,
+    bar: `<button class="btn icon" id="prev" ${s.i ? "" : "disabled"} aria-label="前の問題">◀</button>
+      <button class="btn icon ${s.flag[s.i] ? "flag-on" : ""}" id="flag" aria-label="見直しマーク">${s.flag[s.i] ? "★" : "☆"}</button>
+      <button class="btn grow" id="list">一覧 <span class="muted num" style="font-weight:500">${answered}/${n}</span></button>
+      ${last ? `<button class="btn primary grow" id="finish">採点</button>` : `<button class="btn primary icon" id="next" aria-label="次の問題">▶</button>`}`,
+    progress: answered / n,
+  });
+  updateTimer();
   $app.innerHTML = `
-    <div class="qhead"><b>問${s.i + 1}</b><span>/ ${s.qs.length}</span><span class="tag">${esc(q.cat)}</span><span class="spacer"></span><span>解答済 ${answered}/${s.qs.length}</span></div>
+    <div class="qmeta"><span class="tag">${esc(q.cat)}</span>${s.flag[s.i] ? `<span class="tag" style="color:var(--mid)">★ 見直し</span>` : ""}</div>
     <div class="qtext">${md(q.q)}</div>
-    <div class="choices">${q.c.map((c, k) => `<button class="choice ${s.ans[s.i] === k ? "sel" : ""}" data-k="${k}"><span class="k">${KANA[k]}</span><span>${esc(c)}</span></button>`).join("")}</div>
-    <div class="navbar">
-      <button class="btn" id="prev" ${s.i ? "" : "disabled"}>← 前へ</button>
-      <button class="btn" id="flag">${s.flag[s.i] ? "★ 見直し解除" : "☆ 見直し"}</button>
-      ${s.i < s.qs.length - 1 ? `<button class="btn primary" id="next">次へ →</button>` : `<button class="btn primary" id="finish">採点する</button>`}
-    </div>
-    <div class="qgrid">${s.qs.map((_, j) => `<button data-j="${j}" class="${s.ans[j] !== null ? "ans" : ""} ${j === s.i ? "cur" : ""} ${s.flag[j] ? "flag" : ""}">${j + 1}</button>`).join("")}</div>
-    <div class="navbar"><span class="muted small">★＝見直しマーク</span><button class="btn" id="finish2">途中で採点する</button></div>`;
+    <div class="choices">${q.c.map((c, k) => choiceBtn(c, k, s.ans[s.i] === k ? "sel" : "", false)).join("")}</div>`;
   $app.querySelectorAll(".choice").forEach(b => b.onclick = () => {
     const k = +b.dataset.k; s.ans[s.i] = s.ans[s.i] === k ? null : k; renderMockQ();
   });
-  $app.querySelectorAll(".qgrid button").forEach(b => b.onclick = () => { s.i = +b.dataset.j; renderMockQ(); });
-  const go = d => { s.i += d; renderMockQ(); window.scrollTo(0, 0); };
-  document.getElementById("prev").onclick = () => go(-1);
-  const nx = document.getElementById("next"); if (nx) nx.onclick = () => go(1);
-  document.getElementById("flag").onclick = () => { s.flag[s.i] = !s.flag[s.i]; renderMockQ(); };
-  const fin = () => {
-    const blank = s.ans.filter(a => a === null).length;
-    if (!blank || confirm(`未解答が${blank}問あります。採点しますか？`)) finishMock();
-  };
-  const f1 = document.getElementById("finish"); if (f1) f1.onclick = fin;
-  document.getElementById("finish2").onclick = fin;
+  $("quit").onclick = quitMock;
+  $("prev").onclick = () => mockGo(-1);
+  if ($("next")) $("next").onclick = () => mockGo(1);
+  if ($("finish")) $("finish").onclick = confirmFinish;
+  $("flag").onclick = () => { s.flag[s.i] = !s.flag[s.i]; renderMockQ(); };
+  $("list").onclick = openMockSheet;
+}
+function mockGo(d) {
+  const s = session, j = s.i + d;
+  if (j < 0 || j >= s.qs.length) return;
+  s.i = j; renderMockQ(); toTop();
+}
+function confirmFinish() {
+  const blank = session.ans.filter(a => a === null).length;
+  if (!blank || confirm(`未解答が${blank}問あります。採点しますか？`)) { closeSheet(); finishMock(); }
+}
+function openMockSheet() {
+  const s = session;
+  $sheet.innerHTML = `<div class="sheet-bg" id="sbg"></div>
+    <div class="sheet" role="dialog" aria-label="問題一覧"><div class="wrap">
+      <div class="grab"></div>
+      <h3>問題一覧</h3>
+      <div class="legend">青＝解答済　★＝見直し　タップでその問題へ</div>
+      <div class="qgrid">${s.qs.map((_, j) => `<button data-j="${j}" class="${s.ans[j] !== null ? "ans" : ""} ${j === s.i ? "cur" : ""} ${s.flag[j] ? "flag" : ""}">${j + 1}</button>`).join("")}</div>
+      <button class="btn primary block" id="sFinish">採点する（解答済 ${s.ans.filter(a => a !== null).length}/${s.qs.length}）</button>
+      <button class="btn block" id="sClose">閉じる</button>
+    </div></div>`;
+  $("sbg").onclick = closeSheet; $("sClose").onclick = closeSheet;
+  $("sFinish").onclick = confirmFinish;
+  $sheet.querySelectorAll(".qgrid button").forEach(b => b.onclick = () => { s.i = +b.dataset.j; closeSheet(); renderMockQ(); toTop(); });
 }
 function finishMock() {
   const s = session; stopTimer();
@@ -331,42 +463,53 @@ function finishMock() {
   const p = res.filter(r => isPast(r.q)), o = res.filter(r => !isPast(r.q));
   const ok = res.filter(r => r.ok).length;
   const d = new Date();
-  db.mocks.push({ at: `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`,
+  db.mocks.push({ at: `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`,
     n: res.length, ok, pN: p.length, pOk: p.filter(r => r.ok).length, oN: o.length, oOk: o.filter(r => r.ok).length, sec });
   save();
-  session = { kind: "result", res };
-  renderResult(res, sec);
+  session = { kind: "result", res, sec, filter: "ng" };
+  renderResult();
 }
-function renderResult(res, sec) {
+function renderResult() {
+  const { res, sec } = session;
   const n = res.length, ok = res.filter(r => r.ok).length, pct = Math.round(ok / n * 100);
   const byCat = {};
   res.forEach(r => { const c = byCat[r.q.cat] || (byCat[r.q.cat] = { n: 0, ok: 0 }); c.n++; if (r.ok) c.ok++; });
   const part = f => { const xs = res.filter(f); return xs.length ? `${xs.filter(r => r.ok).length}/${xs.length}` : "—"; };
+  chrome({
+    header: `<span class="brand" id="home">採点結果</span><span class="spacer"></span>${themeBtn}`,
+    bar: `<button class="btn grow" id="back">ホーム</button><button class="btn primary grow" id="again">もう一度</button>`,
+  });
+  const f = session.filter;
+  const shown = res.map((r, j) => [r, j]).filter(([r]) => f === "all" || !r.ok);
   $app.innerHTML = `
-    <h1 class="page">採点結果</h1>
-    <div class="panel">
-      <div class="score"><span class="big">${ok}<small class="muted" style="font-size:1rem">/${n}</small></span><span class="big" style="font-size:1.6rem">${pct}%</span>
-        <span class="pass ${pct >= 60 ? "ok" : "ng"}">${pct >= 60 ? "合格ライン到達" : "合格ライン未達"}</span></div>
-      <p class="small" style="margin:10px 0 0">過去問 ${part(r => isPast(r.q))}　新規 ${part(r => !isPast(r.q))}　所要時間 ${fmtTime(sec)}　（合格基準：60%）</p>
+    <div class="card">
+      <div class="score"><div class="big">${pct}<small>%</small></div>
+        <div class="muted">${ok} / ${n} 問正解</div>
+        <span class="pass ${pct >= 60 ? "ok" : "ng"}">${pct >= 60 ? "合格ライン到達" : "合格ライン未達（60%）"}</span></div>
+      <div class="kv"><div><b>${part(r => isPast(r.q))}</b><span>過去問</span></div><div><b>${part(r => !isPast(r.q))}</b><span>新規</span></div><div><b>${fmtTime(sec)}</b><span>所要時間</span></div></div>
     </div>
-    <h2 class="sec">分野別</h2>
-    <div class="panel">${Object.entries(byCat).map(([c, v]) => `<div class="small" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><span>${esc(c)}</span><span class="num">${v.ok}/${v.n}</span></div><div class="bar"><i style="width:${v.ok / v.n * 100}%"></i></div></div>`).join("")}</div>
-    <h2 class="sec">問題ごとの解説 <span class="muted small">（クリックで展開）</span></h2>
-    ${res.map((r, j) => reviewItem(r, j, !r.ok)).join("")}
-    <div class="navbar"><button class="btn" id="back">ホームへ</button><button class="btn primary" id="again">もう一度模擬試験</button></div>`;
-  document.getElementById("back").onclick = renderHome;
-  document.getElementById("again").onclick = () => startMock(Object.assign({ ratio: 60, count: 25, minutes: 40, timed: true }, db.opt));
-  window.scrollTo(0, 0);
+    <details class="range card"><summary><span>分野別の正答</span></summary>
+      ${Object.entries(byCat).map(([c, v]) => `<div class="catrow"><div class="h"><span>${esc(c)}</span><span class="num">${v.ok}/${v.n}</span></div><div class="bar"><i style="width:${v.ok / v.n * 100}%"></i></div></div>`).join("")}</details>
+    <div class="filters">
+      <span class="chip ${f === "ng" ? "on" : ""}" data-f="ng">間違えた問題（${n - ok}）</span>
+      <span class="chip ${f === "all" ? "on" : ""}" data-f="all">すべて（${n}）</span>
+    </div>
+    ${shown.length ? shown.map(([r, j]) => reviewItem(r, j, false)).join("") : `<p class="muted">全問正解です。</p>`}`;
+  $app.querySelectorAll("[data-f]").forEach(c => c.onclick = () => { session.filter = c.dataset.f; renderResult(); });
+  $("home").onclick = renderHome;
+  $("back").onclick = renderHome;
+  $("again").onclick = () => startMock(opts());
 }
 function reviewItem(r, j, open) {
   const q = r.q;
-  return `<details class="rev" ${open ? "open" : ""}><summary><span class="${r.ok ? "mark-ok" : "mark-ng"}">${r.ok ? "○" : "×"}</span><span class="num">問${j + 1}</span>${srcTag(q)}<span class="ell">${esc(q.q.split("\n")[0])}</span></summary>
+  return `<details class="rev" ${open ? "open" : ""}><summary><span class="${r.ok ? "mark-ok" : "mark-ng"}">${r.ok ? "○" : "×"}</span><span class="num small">問${j + 1}</span><span class="ell">${esc(q.q.split("\n")[0])}</span></summary>
     <div class="body">
+      <div class="qmeta">${srcTag(q)}<span class="tag">${esc(q.cat)}</span></div>
       <div class="qtext">${md(q.q)}</div>
-      <div class="choices">${q.c.map((c, k) => `<button class="choice ${k === q.a ? "correct" : (k === r.a ? "wrong" : "")}" disabled><span class="k">${KANA[k]}</span><span>${esc(c)}</span></button>`).join("")}</div>
-      <div class="feedback ${r.ok ? "ok" : "ng"}">あなたの解答：<b>${r.a === null ? "未解答" : KANA[r.a]}</b>　正解：<b>${KANA[q.a]}</b>
+      <div class="choices">${q.c.map((c, k) => choiceBtn(c, k, k === q.a ? "correct" : (k === r.a ? "wrong" : ""), true)).join("")}</div>
+      <div class="feedback ${r.ok ? "ok" : "ng"}">あなたの解答 <b>${r.a === null ? "未解答" : KANA[r.a]}</b>　正解 <b>${KANA[q.a]}</b>
         ${q.exp ? `<div class="exp">${esc(q.exp)}</div>` : ""}
-        <div class="src">${esc(q.src)}・${esc(q.cat)}${pdfLink(q)}</div></div>
+        <div class="src">${esc(q.src)}${pdfLink(q)}</div></div>
     </div></details>`;
 }
 
@@ -384,45 +527,49 @@ function startDojo(pool, order, title) {
 function renderDojoQ() {
   const s = session, q = s.qs[s.i], st = db.q[q.id];
   const answered = s.picked !== null;
+  const last = s.i === s.qs.length - 1;
+  chrome({
+    header: `<button class="iconbtn" id="quit" aria-label="終了">✕</button><span class="hd-prog">${s.i + 1}<span class="muted" style="font-weight:500"> / ${s.qs.length}</span></span><span class="spacer"></span><span class="muted small num">正解 ${s.ok}/${s.done}</span>${themeBtn}`,
+    bar: answered
+      ? `<button class="btn primary grow" id="next">${last ? "結果を見る" : "次の問題 ▶"}</button>`
+      : `<span class="hint">選択肢をタップして解答</span>`,
+    progress: s.i / s.qs.length,
+  });
   $app.innerHTML = `
-    <div class="qhead"><b>${esc(s.title)}</b><span>${s.i + 1} / ${s.qs.length}</span>${srcTag(q)}<span class="tag">${esc(q.cat)}</span><span class="spacer"></span><span>正解 ${s.ok}/${s.done}</span></div>
-    <div class="qhead small">${esc(q.src)}${st ? `　これまで ${st.ok}/${st.n} 正解` : "　初出題"}</div>
+    <div class="qmeta">${srcTag(q)}<span class="tag">${esc(q.cat)}</span><span>${esc(q.src)}</span><span>${st ? `これまで ${st.ok}/${st.n}` : "初出題"}</span></div>
     <div class="qtext">${md(q.q)}</div>
-    <div class="choices">${q.c.map((c, k) => {
-      const cls = !answered ? "" : (k === q.a ? "correct" : (k === s.picked ? "wrong" : ""));
-      return `<button class="choice ${cls}" data-k="${k}" ${answered ? "disabled" : ""}><span class="k">${KANA[k]}</span><span>${esc(c)}</span></button>`;
-    }).join("")}</div>
-    ${answered ? `<div class="feedback ${s.picked === q.a ? "ok" : "ng"}">${s.picked === q.a ? `<b class="ok">正解！</b>` : `<b class="ng">不正解</b>　正解は <b>${KANA[q.a]}</b>`}
-      ${q.exp ? `<div class="exp">${esc(q.exp)}</div>` : ""}<div class="src">${esc(q.src)}${pdfLink(q)}</div></div>` : ""}
-    <div class="navbar">
-      <button class="btn" id="quit">終了</button>
-      ${answered ? (s.i < s.qs.length - 1 ? `<button class="btn primary" id="next">次の問題 →</button>` : `<button class="btn primary" id="end">結果を見る</button>`) : `<span class="muted small">キーボード：1〜4 / A〜D で選択</span>`}
-    </div>`;
-  $app.querySelectorAll(".choice").forEach(b => b.onclick = () => pickDojo(+b.dataset.k));
-  document.getElementById("quit").onclick = endDojo;
-  const nx = document.getElementById("next"); if (nx) nx.onclick = nextDojo;
-  const en = document.getElementById("end"); if (en) en.onclick = endDojo;
+    <div class="choices">${q.c.map((c, k) => choiceBtn(c, k, !answered ? "" : (k === q.a ? "correct" : (k === s.picked ? "wrong" : "")), answered)).join("")}</div>
+    ${answered ? `<div class="feedback ${s.picked === q.a ? "ok" : "ng"}" id="fb">${s.picked === q.a ? `<span class="verdict ok">○ 正解</span>` : `<span class="verdict ng">× 不正解</span>　正解は <b>${KANA[q.a]}</b>`}
+      ${q.exp ? `<div class="exp">${esc(q.exp)}</div>` : ""}<div class="src">${esc(q.src)}${pdfLink(q)}</div></div>` : ""}`;
+  $app.querySelectorAll(".choice:not([disabled])").forEach(b => b.onclick = () => pickDojo(+b.dataset.k));
+  $("quit").onclick = endDojo;
+  if ($("next")) $("next").onclick = () => last ? endDojo() : nextDojo();
 }
 function pickDojo(k) {
   const s = session; if (s.picked !== null) return;
   const q = s.qs[s.i]; s.picked = k; s.done++;
   if (k === q.a) s.ok++;
   record(q.id, k === q.a); save(); renderDojoQ();
+  const fb = $("fb");
+  if (fb) requestAnimationFrame(() => fb.scrollIntoView({ behavior: "smooth", block: "nearest" }));
 }
-function nextDojo() { session.i++; session.picked = null; renderDojoQ(); window.scrollTo(0, 0); }
+function nextDojo() { session.i++; session.picked = null; renderDojoQ(); toTop(); }
 function endDojo() {
   const s = session;
-  $app.innerHTML = `<h1 class="page">${esc(s.title)} 終了</h1>
-    <div class="panel"><div class="score"><span class="big">${s.ok}<small class="muted" style="font-size:1rem">/${s.done}</small></span>
-    ${s.done ? `<span class="big" style="font-size:1.6rem">${Math.round(s.ok / s.done * 100)}%</span>` : ""}</div></div>
-    <div class="navbar"><button class="btn primary" id="back">ホームへ</button></div>`;
-  document.getElementById("back").onclick = renderHome;
-  session = null;
+  chrome({
+    header: `<span class="brand" id="home">${esc(s.title)} 終了</span><span class="spacer"></span>${themeBtn}`,
+    bar: `<button class="btn primary grow" id="back">ホームへ</button>`,
+  });
+  $app.innerHTML = `<div class="card"><div class="score"><div class="big">${s.done ? Math.round(s.ok / s.done * 100) : 0}<small>%</small></div>
+    <div class="muted">${s.ok} / ${s.done} 問正解</div></div></div>`;
+  $("home").onclick = renderHome; $("back").onclick = renderHome;
+  session = null; toTop();
 }
 
 // ---------- キーボード ----------
 document.addEventListener("keydown", e => {
   if (!session || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === "Escape") return closeSheet();
   const k = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
   if (session.kind === "dojo") {
     if (k >= 0 && session.picked === null) pickDojo(k);
@@ -431,28 +578,37 @@ document.addEventListener("keydown", e => {
     }
   } else if (session.kind === "mock") {
     if (k >= 0) { session.ans[session.i] = k; renderMockQ(); }
-    else if (e.key === "ArrowRight" && session.i < session.qs.length - 1) { session.i++; renderMockQ(); }
-    else if (e.key === "ArrowLeft" && session.i > 0) { session.i--; renderMockQ(); }
+    else if (e.key === "ArrowRight") mockGo(1);
+    else if (e.key === "ArrowLeft") mockGo(-1);
   }
 });
 
-// ---------- 共通 ----------
-document.getElementById("home").onclick = () => {
-  if (session && session.kind === "mock" && !confirm("模擬試験を中断してホームに戻りますか？（記録されません）")) return;
-  renderHome();
-};
-window.addEventListener("beforeunload", e => { if (session && session.kind === "mock") { e.preventDefault(); e.returnValue = ""; } });
-(function theme() {
-  // 午後サイト（sc/index.html）と同じキーでテーマを共有する
-  const root = document.documentElement, KEY = "sc:theme";
-  let t = null; try { t = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-  if (t) root.dataset.theme = t;
-  document.getElementById("theme").onclick = () => {
-    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    root.dataset.theme = dark ? "light" : "dark";
-    try { localStorage.setItem(KEY, JSON.stringify(root.dataset.theme)); } catch (e) {}
-  };
+// ---------- スワイプ（模試の問題移動） ----------
+(function swipe() {
+  let x0 = null, y0 = 0, t0 = 0;
+  $app.addEventListener("touchstart", e => {
+    if (!session || session.kind !== "mock" || e.touches.length !== 1 || e.target.closest("table, pre")) { x0 = null; return; }
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+  }, { passive: true });
+  $app.addEventListener("touchend", e => {
+    if (x0 === null || !session || session.kind !== "mock") return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8 && Date.now() - t0 < 600) mockGo(dx < 0 ? 1 : -1);
+  }, { passive: true });
 })();
+
+// ---------- 共通 ----------
+window.addEventListener("beforeunload", e => { if (session && session.kind === "mock") { e.preventDefault(); e.returnValue = ""; } });
+// 午後サイト（sc/index.html）と同じキーでテーマを共有する
+const THEME_KEY = "sc:theme";
+try { const t = JSON.parse(localStorage.getItem(THEME_KEY)); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem(THEME_KEY, JSON.stringify(root.dataset.theme)); } catch (e) {}
+}
 fetch("bank.json").then(r => r.json()).then(b => {
   BANK = b; ALL = [...b.past, ...b.original];
   ALL.forEach(q => BYID[q.id] = q);
