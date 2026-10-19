@@ -271,7 +271,13 @@ function renderHome() {
 function startMock(o) {
   const nPast = Math.min(Math.round(o.count * o.ratio / 100), BANK.past.length);
   const nOrig = Math.min(o.count - nPast, BANK.original.length);
-  const qs = shuffle([...shuffle(BANK.past).slice(0, nPast), ...shuffle(BANK.original).slice(0, nOrig)]);
+  // 午前IIは同じ問題が別の回で再出題されるので，問題文が同じものは1問だけ選ぶ
+  const seen = new Set(), past = [];
+  for (const q of shuffle(BANK.past)) {
+    const k = q.q.replace(/\s/g, "");
+    if (past.length < nPast && !seen.has(k)) { seen.add(k); past.push(q); }
+  }
+  const qs = shuffle([...past, ...shuffle(BANK.original).slice(0, nOrig)]);
   session = { kind: "mock", qs, ans: Array(qs.length).fill(null), flag: Array(qs.length).fill(false), i: 0, start: Date.now(), limit: o.timed ? o.minutes * 60 : 0 };
   $timer.hidden = false;
   tick = setInterval(updateTimer, 1000); updateTimer();
