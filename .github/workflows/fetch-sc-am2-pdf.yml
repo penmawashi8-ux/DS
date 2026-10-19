@@ -1,0 +1,41 @@
+name: Fetch SC morning-II exam PDFs
+
+on:
+  push:
+    branches: [claude/kanto-factory-tours-no-reservation-f34hg5]
+    paths: [.github/workflows/fetch-sc-am2-pdf.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download SC morning-II PDFs from IPA
+        run: |
+          set -u
+          mkdir -p pdf/am2
+          UA="Mozilla/5.0"
+          # 午前IIは午後PDFと同じ「〜-att/」ディレクトリに置かれているので、
+          # 既に取得済みの URL 一覧から回ごとのディレクトリを割り出す
+          sed -nE 's#^(https://www\.ipa\.go\.jp/.*-att/)(20(1[6-9]|2[0-9])[a-z0-9]+)_sc_.*#\1 \2#p' pdf/_found_urls.txt \
+            | sort -u > /tmp/exams.txt
+          cat /tmp/exams.txt
+          while read -r dir id; do
+            for kind in qs ans; do
+              b="${id}_sc_am2_${kind}.pdf"
+              [ -f "pdf/am2/$b" ] && continue
+              curl -fsSL --retry 3 -A "$UA" -o "pdf/am2/$b" "$dir$b" && file "pdf/am2/$b" || rm -f "pdf/am2/$b"
+            done
+          done < /tmp/exams.txt
+          ls -la pdf/am2
+      - name: Commit PDFs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pdf/am2
+          git diff --cached --quiet || git commit -m "Add SC morning-II exam PDFs from IPA"
+          git push
