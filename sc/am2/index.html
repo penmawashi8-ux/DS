@@ -213,7 +213,7 @@ footer { color: var(--muted); font-size: .78rem; line-height: 1.7; border-top: 1
 "use strict";
 const KANA = ["ア", "イ", "ウ", "エ"];
 const STORE = "sc-am2-v1";
-const DEF_OPT = { ratio: 60, count: 25, minutes: 40 };   // minutes: 0 = 制限なし
+const DEF_OPT = { ratio: 60, count: 25, minutes: 40, check: "each" };   // minutes: 0 = 制限なし / check: each = 1問ごとに答え合わせ, end = 最後にまとめて
 const $app = document.getElementById("app");
 const $hd = document.getElementById("hd");
 const $bar = document.getElementById("bar");
@@ -296,13 +296,14 @@ function renderHome() {
     </div>
 
     <div class="card" data-pane="mock" ${tab === "mock" ? "" : "hidden"}>
-      <p>過去問 ${BANK.past.length}問（${BANK.exams.length}回分）＋新規 ${BANK.original.length}問から出題。最後にまとめて採点し，合格ラインは60%です。</p>
+      <p>過去問 ${BANK.past.length}問（${BANK.exams.length}回分）＋新規 ${BANK.original.length}問から出題。最後に得点を出します（合格ライン60%）。</p>
       <div class="field">
         <div class="lbl"><span>過去問の割合</span><b id="ratioV"></b></div>
         <input type="range" id="ratio" min="0" max="100" step="10" value="${o.ratio}" aria-label="過去問の割合">
       </div>
       <div class="field"><div class="lbl"><span>問題数</span></div>${seg("count", [10, 15, 20, 25], o.count, v => v + "問")}</div>
       <div class="field"><div class="lbl"><span>制限時間</span></div>${seg("minutes", [0, 20, 30, 40], o.minutes, v => v ? v + "分" : "なし")}</div>
+      <div class="field"><div class="lbl"><span>答え合わせ</span></div>${seg("check", ["each", "end"], o.check, v => ({ each: "1問ごと", end: "最後にまとめて" })[v])}</div>
       <button class="btn primary block" id="startMock">模擬試験を始める</button>
     </div>
 
@@ -345,7 +346,7 @@ function renderHome() {
   document.querySelectorAll("input[name=count]").forEach(r => r.onchange = showRatio);
   showRatio();
   $("startMock").onclick = () => {
-    db.opt = { ratio: +ratio.value, count: radio("count"), minutes: radio("minutes") };
+    db.opt = { ratio: +ratio.value, count: radio("count"), minutes: radio("minutes"), check: document.querySelector("input[name=check]:checked").value };
     save(); startMock(db.opt);
   };
   const pool = () => {
@@ -385,7 +386,7 @@ function startMock(o) {
     if (past.length < nPast && !seen.has(k)) { seen.add(k); past.push(q); }
   }
   const qs = shuffle([...past, ...shuffle(BANK.original).slice(0, nOrig)]);
-  session = { kind: "mock", qs, ans: Array(qs.length).fill(null), flag: Array(qs.length).fill(false), i: 0, start: Date.now(), limit: o.minutes * 60 };
+  session = { kind: "mock", qs, ans: Array(qs.length).fill(null), flag: Array(qs.length).fill(false), i: 0, start: Date.now(), limit: o.minutes * 60, each: o.check === "each" };
   tick = setInterval(updateTimer, 1000);
   renderMockQ();
 }
@@ -408,6 +409,9 @@ function renderMockQ() {
   const s = session, q = s.qs[s.i], n = s.qs.length;
   const answered = s.ans.filter(a => a !== null).length;
   const last = s.i === n - 1;
+  const a = s.ans[s.i];
+  const locked = s.each && a !== null;   // 1問ごとモードでは解答後に答え合わせして確定する
+  const choiceCls = k => !locked ? (a === k ? "sel" : "") : (k === q.a ? "correct" : (k === a ? "wrong" : ""));
   chrome({
     header: `<button class="iconbtn" id="quit" aria-label="中断">✕</button><span class="hd-prog">問${s.i + 1}<span class="muted" style="font-weight:500"> / ${n}</span></span><span class="spacer"></span><span class="timer" id="timer"></span>${themeBtn}`,
     bar: `<button class="btn icon" id="prev" ${s.i ? "" : "disabled"} aria-label="前の問題">◀</button>
@@ -420,16 +424,31 @@ function renderMockQ() {
   $app.innerHTML = `
     <div class="qmeta"><span class="tag">${esc(q.cat)}</span>${s.flag[s.i] ? `<span class="tag" style="color:var(--mid)">★ 見直し</span>` : ""}</div>
     <div class="qtext">${md(q.q)}</div>
-    <div class="choices">${q.c.map((c, k) => choiceBtn(c, k, s.ans[s.i] === k ? "sel" : "", false)).join("")}</div>`;
-  $app.querySelectorAll(".choice").forEach(b => b.onclick = () => {
-    const k = +b.dataset.k; s.ans[s.i] = s.ans[s.i] === k ? null : k; renderMockQ();
-  });
+    <div class="choices">${q.c.map((c, k) => choiceBtn(c, k, choiceCls(k), locked)).join("")}</div>
+    ${locked ? feedbackHtml(q, a) : ""}`;
+  $app.querySelectorAll(".choice:not([disabled])").forEach(b => b.onclick = () => pickMock(+b.dataset.k));
   $("quit").onclick = quitMock;
   $("prev").onclick = () => mockGo(-1);
   if ($("next")) $("next").onclick = () => mockGo(1);
   if ($("finish")) $("finish").onclick = confirmFinish;
   $("flag").onclick = () => { s.flag[s.i] = !s.flag[s.i]; renderMockQ(); };
   $("list").onclick = openMockSheet;
+}
+function pickMock(k) {
+  const s = session;
+  if (s.each) {
+    if (s.ans[s.i] !== null) return;
+    s.ans[s.i] = k; renderMockQ();
+    const fb = $("fb");
+    if (fb) requestAnimationFrame(() => fb.scrollIntoView({ behavior: "smooth", block: "nearest" }));
+  } else {
+    s.ans[s.i] = s.ans[s.i] === k ? null : k; renderMockQ();
+  }
+}
+function feedbackHtml(q, a) {
+  const ok = a === q.a;
+  return `<div class="feedback ${ok ? "ok" : "ng"}" id="fb">${ok ? `<span class="verdict ok">○ 正解</span>` : `<span class="verdict ng">× 不正解</span>　正解は <b>${KANA[q.a]}</b>`}
+    ${q.exp ? `<div class="exp">${esc(q.exp)}</div>` : ""}<div class="src">${esc(q.src)}${pdfLink(q)}</div></div>`;
 }
 function mockGo(d) {
   const s = session, j = s.i + d;
@@ -446,8 +465,11 @@ function openMockSheet() {
     <div class="sheet" role="dialog" aria-label="問題一覧"><div class="wrap">
       <div class="grab"></div>
       <h3>問題一覧</h3>
-      <div class="legend">青＝解答済　★＝見直し　タップでその問題へ</div>
-      <div class="qgrid">${s.qs.map((_, j) => `<button data-j="${j}" class="${s.ans[j] !== null ? "ans" : ""} ${j === s.i ? "cur" : ""} ${s.flag[j] ? "flag" : ""}">${j + 1}</button>`).join("")}</div>
+      <div class="legend">${s.each ? "緑＝正解　赤＝不正解" : "青＝解答済"}　★＝見直し　タップでその問題へ</div>
+      <div class="qgrid">${s.qs.map((q, j) => {
+        const a = s.ans[j], st = a === null ? "" : !s.each ? "ans" : (a === q.a ? "ok" : "ng");
+        return `<button data-j="${j}" class="${st} ${j === s.i ? "cur" : ""} ${s.flag[j] ? "flag" : ""}">${j + 1}</button>`;
+      }).join("")}</div>
       <button class="btn primary block" id="sFinish">採点する（解答済 ${s.ans.filter(a => a !== null).length}/${s.qs.length}）</button>
       <button class="btn block" id="sClose">閉じる</button>
     </div></div>`;
@@ -539,8 +561,7 @@ function renderDojoQ() {
     <div class="qmeta">${srcTag(q)}<span class="tag">${esc(q.cat)}</span><span>${esc(q.src)}</span><span>${st ? `これまで ${st.ok}/${st.n}` : "初出題"}</span></div>
     <div class="qtext">${md(q.q)}</div>
     <div class="choices">${q.c.map((c, k) => choiceBtn(c, k, !answered ? "" : (k === q.a ? "correct" : (k === s.picked ? "wrong" : "")), answered)).join("")}</div>
-    ${answered ? `<div class="feedback ${s.picked === q.a ? "ok" : "ng"}" id="fb">${s.picked === q.a ? `<span class="verdict ok">○ 正解</span>` : `<span class="verdict ng">× 不正解</span>　正解は <b>${KANA[q.a]}</b>`}
-      ${q.exp ? `<div class="exp">${esc(q.exp)}</div>` : ""}<div class="src">${esc(q.src)}${pdfLink(q)}</div></div>` : ""}`;
+    ${answered ? feedbackHtml(q, s.picked) : ""}`;
   $app.querySelectorAll(".choice:not([disabled])").forEach(b => b.onclick = () => pickDojo(+b.dataset.k));
   $("quit").onclick = endDojo;
   if ($("next")) $("next").onclick = () => last ? endDojo() : nextDojo();
@@ -577,7 +598,7 @@ document.addEventListener("keydown", e => {
       session.i < session.qs.length - 1 ? nextDojo() : endDojo();
     }
   } else if (session.kind === "mock") {
-    if (k >= 0) { session.ans[session.i] = k; renderMockQ(); }
+    if (k >= 0) pickMock(k);
     else if (e.key === "ArrowRight") mockGo(1);
     else if (e.key === "ArrowLeft") mockGo(-1);
   }
