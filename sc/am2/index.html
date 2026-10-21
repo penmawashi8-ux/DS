@@ -255,6 +255,7 @@ function pdfLink(q) { return q.pdf ? ` <a href="../../pdf/am2/${q.pdf}" target="
 function choiceBtn(c, k, cls, disabled) {
   return `<button class="choice ${cls}" data-k="${k}" ${disabled ? "disabled" : ""}><span class="k">${KANA[k]}</span><span>${esc(c)}</span></button>`;
 }
+function topicQs(t) { return t.ids.map(id => BYID[id]).filter(Boolean); }
 function toTop() { window.scrollTo(0, 0); }
 
 // ヘッダー・下部バー・進捗バーを画面ごとに切り替える
@@ -292,6 +293,7 @@ function renderHome() {
     <div class="tabs" role="tablist">
       <button role="tab" data-tab="mock" class="${tab === "mock" ? "on" : ""}">模擬試験</button>
       <button role="tab" data-tab="dojo" class="${tab === "dojo" ? "on" : ""}">一問一答</button>
+      <button role="tab" data-tab="topic" class="${tab === "topic" ? "on" : ""}">テーマ別</button>
       <button role="tab" data-tab="rec" class="${tab === "rec" ? "on" : ""}">記録</button>
     </div>
 
@@ -317,6 +319,18 @@ function renderHome() {
       <div class="field"><div class="lbl"><span>出題順</span></div>${seg("order", ["rand", "weak", "seq"], "rand", v => ({ rand: "ランダム", weak: "苦手優先", seq: "順番" })[v])}</div>
       <button class="btn primary block" id="startDojo"></button>
       <button class="btn block" id="startWrong" ${wrong ? "" : "disabled"}>間違えた問題だけ（${wrong}問）</button>
+    </div>
+
+    <div data-pane="topic" ${tab === "topic" ? "" : "hidden"}>
+      ${BANK.topics.map(t => {
+        const qs = topicQs(t), done = qs.filter(q => db.q[q.id]).length, ok = qs.filter(q => db.q[q.id] && db.q[q.id].last === 1).length;
+        return `<div class="card">
+          <h3>${esc(t.label)}<span class="muted small" style="font-weight:500">　過去問 ${qs.length}問</span></h3>
+          <p>${esc(t.desc)}</p>
+          <p class="small" style="margin-top:-4px">解いた ${done}/${qs.length}・直近で正解 ${ok}</p>
+          <button class="btn primary block" data-topic="${t.id}">1問ずつ解く</button>
+        </div>`;
+      }).join("")}
     </div>
 
     <div data-pane="rec" ${tab === "rec" ? "" : "hidden"}>
@@ -367,6 +381,10 @@ function renderHome() {
   });
   showPool();
   $("startDojo").onclick = () => startDojo(pool(), radio("order"), "一問一答");
+  $app.querySelectorAll("[data-topic]").forEach(b => b.onclick = () => {
+    const t = BANK.topics.find(x => x.id === b.dataset.topic);
+    startDojo(topicQs(t), "rand", t.label);
+  });
   $("startWrong").onclick = () => startDojo(ALL.filter(q => db.q[q.id] && db.q[q.id].last === 0), "rand", "復習");
   $("reset").onclick = () => {
     if (confirm("解答履歴と模擬試験の記録を全て削除します。よろしいですか？")) { db = { q: {}, mocks: [], opt: db.opt }; save(); renderHome(); }

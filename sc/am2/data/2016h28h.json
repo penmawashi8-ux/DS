@@ -1,0 +1,18 @@
+{
+ "id": "2016h28h",
+ "label": "平成28年度 春期",
+ "questions": [
+  {
+   "no": 19,
+   "cat": "ネットワーク",
+   "q": "IPv4ネットワークでIPアドレスを割り当てる際に，DHCPクライアントとDHCPサーバ間でやり取りされるメッセージの順序として，適切なものはどれか。",
+   "c": [
+    "DHCPDISCOVER，DHCPACK，DHCPREQUEST，DHCPOFFER",
+    "DHCPDISCOVER，DHCPOFFER，DHCPREQUEST，DHCPACK",
+    "DHCPREQUEST，DHCPACK，DHCPDISCOVER，DHCPOFFER",
+    "DHCPREQUEST，DHCPDISCOVER，DHCPOFFER，DHCPACK"
+   ],
+   "exp": "DISCOVER（探索）→OFFER（提案）→REQUEST（要求）→ACK（承認）。頭文字でDORA。"
+  }
+ ]
+}

@@ -17,6 +17,17 @@ PDF = REPO / "pdf" / "am2"
 OUT = REPO / "sc" / "am2" / "bank.json"
 KANA = "アイウエ"
 
+# テーマ別の問題集（過去問だけ）。同じ問題が別の回に再出題されている場合は1つだけ載せる
+TOPICS = [
+    {"id": "calc", "label": "計算問題", "desc": "可用性・スループット・費用・場合の数など，手を動かして解く問題",
+     "ids": ["2025r07a-24", "2025r07h-24", "2023r05h-18", "2017h29a-19", "2021r03a-20", "2017h29a-20",
+             "2022r04a-24", "2020r02o-24", "2022r04h-04", "2019h31h-24"]},
+    {"id": "addr", "label": "アドレス・ネットワーク", "desc": "IPアドレス，サブネット，ブロードキャスト／マルチキャスト，DHCP・ARPなど",
+     "ids": ["2023r05a-18", "2021r03a-20", "2017h29a-20", "2023r05h-20", "2020r02o-18", "2023r05a-19",
+             "2022r04a-19", "2021r03h-20", "2023r05a-20", "2016h28h-19", "2022r04a-18", "2025r07h-18",
+             "2024r06h-18", "2025r07a-07"]},
+]
+
 
 def answers_from_pdf(exam_id):
     pdf = PDF / f"{exam_id}_sc_am2_ans.pdf"
@@ -61,7 +72,12 @@ def main():
         "id": f"orig-{q['no']:03d}", "src": f"オリジナル {q['no']}", "exam": "original",
         "cat": q["cat"], "q": q["q"], "c": q["c"], "a": q["a"], "exp": q.get("exp", ""),
     } for q in orig_doc["questions"]]
-    bank = {"exams": exams, "past": past, "original": orig}
+    known = {q["id"] for q in past}
+    for t in TOPICS:
+        missing = [i for i in t["ids"] if i not in known]
+        if missing:
+            raise SystemExit(f"テーマ {t['id']}: 未登録の問題 {missing}")
+    bank = {"exams": exams, "past": past, "original": orig, "topics": TOPICS}
     OUT.write_text(json.dumps(bank, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
     print(f"{OUT.relative_to(REPO)}: 過去問 {len(past)}問（{len(exams)}回）, 新規 {len(orig)}問")
 
