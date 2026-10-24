@@ -2,7 +2,11 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141b" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SC午後">
 <title>SC午後 過去問解説</title>
 <meta name="description" content="情報処理安全確保支援士試験 午後（新形式）の過去問を、問題文の書き起こし・自作解答と解説・公式解答例との照合で整理した学習サイト">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,11 +107,70 @@ h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
 .j-ok { color: var(--ok); font-weight: 700; } .j-mid { color: var(--mid); font-weight: 700; } .j-ng { color: var(--ng); font-weight: 700; }
 footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; padding: 20px 0 40px; }
 .err { color: var(--ng); }
+/* 問題ページ：上部固定タブ・下部固定バー・目次シート */
+body { -webkit-tap-highlight-color: transparent; }
+header.top { padding-top: env(safe-area-inset-top); }
+.wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.md { font-size: calc(1rem * var(--fs, 1)); }
+.qview .tabs { position: sticky; top: calc(56px + env(safe-area-inset-top)); z-index: 9; background: var(--bg); margin: 0 0 14px; }
+.qview .md h2, .qview .md h3, .qview .md .q-anchor { scroll-margin-top: calc(110px + env(safe-area-inset-top)); }
+.md .q-anchor { background: var(--accent-weak); border-radius: 8px; padding: 8px 10px; }
+body.in-q main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+.qbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
+.qbar .wrap { display: flex; gap: 6px; align-items: center; height: 60px; }
+.qbar button, .qbar a { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; height: 44px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit; font-size: .85rem; font-weight: 500; cursor: pointer; text-decoration: none; touch-action: manipulation; white-space: nowrap; }
+.qbar .dis { opacity: .35; pointer-events: none; }
+.qbar .on { background: var(--ok-weak); border-color: var(--ok); color: var(--ok); }
+.sheet-bg { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.35); }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--surface); border-radius: 18px 18px 0 0; padding: 10px 0 calc(16px + env(safe-area-inset-bottom)); max-height: 75vh; overflow-y: auto; box-shadow: 0 -4px 20px rgba(0,0,0,.2); }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--border); margin: 0 auto 10px; }
+.sheet h3 { margin: 0 0 8px; font-size: 1rem; }
+.toc a { display: block; padding: 10px 4px; border-bottom: 1px solid var(--border); color: var(--text); font-size: .92rem; line-height: 1.5; }
+.toc a.lv3 { padding-left: 18px; font-size: .86rem; color: var(--muted); }
+.toc a.qs { font-weight: 700; color: var(--accent); }
+.fsrow { display: flex; gap: 8px; align-items: center; margin: 4px 0 14px; font-size: .88rem; color: var(--muted); }
+.fsrow button { flex: 1; height: 40px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
 @media (max-width: 560px) {
-  .panel { padding: 16px 14px; }
-  h1.page { font-size: 1.25rem; }
+  header.top .wrap { height: 50px; gap: 8px; }
+  .qview .tabs { top: calc(50px + env(safe-area-inset-top)); }
+  .brand { font-size: .98rem; }
   .brand small { display: none; }
+  main { padding-top: 14px; }
+  h1.page { font-size: 1.15rem; }
+  .sub { font-size: .86rem; margin-bottom: 14px; }
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+  .stat { padding: 10px 12px; }
+  .stat b { font-size: 1.2rem; }
+  .grid { grid-template-columns: 1fr; gap: 8px; }
+  .card { padding: 12px 14px; }
+  .card .lead { -webkit-line-clamp: 1; }
+  .legend { gap: 8px; }
+  /* 本文は余白を詰めて全幅で読む */
+  .qview .panel { padding: 4px 0; border: none; background: none; box-shadow: none; }
+  .qview .tabs { margin: 0 -16px 10px; padding: 0 8px; }
+  .qview .tabs button { flex: 1; padding: 10px 6px; font-size: .9rem; }
+  .qview .qhead { margin-bottom: 6px; }
+  .qview .qhead .check { display: none; }
+  .qview .pager { display: none; }
+  .md { line-height: 1.85; }
+  .md h1 { font-size: 1.05rem; }
+  .md h2 { font-size: 1.02rem; margin: 24px 0 8px; }
+  .md h3 { font-size: .96rem; }
+  .md pre { margin-left: -16px; margin-right: -16px; border-radius: 0; border-left: none; border-right: none; padding: 10px 16px; }
+  .md pre code { white-space: pre-wrap; word-break: break-all; font-size: .76rem; }
+  .tbl { margin-left: -16px; margin-right: -16px; border-radius: 0; border-left: none; border-right: none; }
+  .md table { font-size: .8rem; }
+  .md th { white-space: normal; }
+  /* 列が潰れて1文字ずつ折り返さないよう最小幅を取り，はみ出す表は横スクロール */
+  .md td, .md th { min-width: 7em; }
+  .md td:first-child, .md th:first-child { min-width: 4.5em; }
+  .qview .md > h1:first-child { display: none; }
+  .md th, .md td { padding: 6px 8px; }
+  .md blockquote { font-size: .86rem; padding: 8px 12px; }
+  footer { font-size: .76rem; }
 }
+@media (min-width: 561px) { .qbar { display: none; } body.in-q main, body.in-q footer { padding-bottom: revert; } }
 </style>
 </head>
 <body>
@@ -153,7 +216,11 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8
       .replace(/(<td>\s*)(<strong>)?(◎|○)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ok">$3</span>$5')
       .replace(/(<td>\s*)(<strong>)?(△)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-mid">$3</span>$5')
       .replace(/(<td>\s*)(<strong>)?(×)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ng">$3</span>$5');
-    return '<div class="md">' + html + "</div>";
+    let n = 0;
+    const out = html
+      .replace(/<h([23])>/g, (m, lv) => `<h${lv} id="s${n++}">`)
+      .replace(/<p><strong>(設問\s*\d+)<\/strong>/g, (m, t) => `<p class="q-anchor" id="s${n++}"><strong>${t}</strong>`);
+    return '<div class="md">' + out + "</div>";
   };
   // split a markdown file at "## " headings -> { common: [...], q: {1: "...", ...} }
   const splitSections = md => {
@@ -246,38 +313,91 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8
     const tabs = [["mondai", "問題文"], ["kaisetsu", "解答・解説"], ["shougou", "公式との照合"]];
     tab = tabs.some(t => t[0] === tab) ? tab : "mondai";
     const done = store.get(doneKey(id, no), false);
-    $app.innerHTML = `<div class="crumbs"><a href="#/">トップ</a> / <a href="#/${id}">${esc(e.label)}</a> / 問${no}</div>
+    $app.innerHTML = `<div class="qview"><div class="crumbs"><a href="#/">トップ</a> / <a href="#/${id}">${esc(e.label)}</a> / 問${no}</div>
       <div class="qhead"><h1 class="page">問${no} ${esc(q.theme)}</h1>
         <label class="check"><input type="checkbox" id="done" ${done ? "checked" : ""}> 解いた</label></div>
       <div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${k === tab}" data-tab="${k}">${l}</button>`).join("")}</div>
       <div class="panel" id="panel"><p class="sub">読み込み中…</p></div>
-      <div class="pager"><span>${prev ? `<a href="#/${id}/${prev.no}">← 問${prev.no} ${esc(prev.theme)}</a>` : ""}</span><span>${next ? `<a href="#/${id}/${next.no}">問${next.no} ${esc(next.theme)} →</a>` : ""}</span></div>`;
+      <div class="pager"><span>${prev ? `<a href="#/${id}/${prev.no}">← 問${prev.no} ${esc(prev.theme)}</a>` : ""}</span><span>${next ? `<a href="#/${id}/${next.no}">問${next.no} ${esc(next.theme)} →</a>` : ""}</span></div></div>`;
+    document.body.classList.add("in-q");
+    qbar.innerHTML = `<div class="wrap">
+      <a href="${prev ? `#/${id}/${prev.no}/${tab}` : "#"}" class="${prev ? "" : "dis"}" aria-label="前の問題">◀ 問${prev ? prev.no : ""}</a>
+      <button id="tocBtn">目次・文字</button>
+      <button id="doneBtn" class="${done ? "on" : ""}">${done ? "✓ 解いた" : "解いた"}</button>
+      <a href="${next ? `#/${id}/${next.no}/${tab}` : "#"}" class="${next ? "" : "dis"}" aria-label="次の問題">問${next ? next.no : ""} ▶</a></div>`;
+    qbar.hidden = false;
+    document.getElementById("doneBtn").onclick = ev => {
+      const v = !store.get(doneKey(id, no), false); store.set(doneKey(id, no), v);
+      ev.currentTarget.classList.toggle("on", v); ev.currentTarget.textContent = v ? "✓ 解いた" : "解いた";
+      document.getElementById("done").checked = v;
+    };
+    document.getElementById("tocBtn").onclick = openToc;
     document.getElementById("done").onchange = ev => store.set(doneKey(id, no), ev.target.checked);
+    // タブごとのスクロール位置を覚えて，問題文と解答を行き来しても読んでいた位置に戻る
+    const posKey = `${id}/${no}/${tab}`;
     $app.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { location.hash = `#/${id}/${no}/${b.dataset.tab}`; });
     const panel = document.getElementById("panel");
     const show = async () => {
       try {
         if (tab === "mondai") {
           panel.innerHTML = render(await load(`${id}/mondai_q${no}.md`));
+          restore();
         } else {
           const file = tab === "kaisetsu" ? "kaitou_kaisetsu.md" : "shougou.md";
           const sec = splitSections(await load(`${id}/${file}`)).q[no];
           panel.innerHTML = sec ? render(sec) : `<p class="sub">まだ用意されていません。</p>`;
+          restore();
         }
       } catch (err) { panel.innerHTML = `<p class="err">読み込みに失敗しました：${esc(err.message)}</p>`; }
     };
+    const restore = () => window.scrollTo(0, scrollPos[posKey] || 0);
+    curPosKey = posKey;
     const revealKey = "reveal:" + id + ":" + no;
     if (tab !== "mondai" && !store.get(revealKey, false)) {
       panel.innerHTML = `<div class="gate"><p>先に自分で解いてみましょう。<br>答えを表示すると、この問題では次回から確認なしで表示します。</p>
         <button class="btn" id="reveal">答えを表示する</button></div>`;
       document.getElementById("reveal").onclick = () => { store.set(revealKey, true); show(); };
     } else show();
-    window.scrollTo(0, 0);
+    window.scrollTo(0, scrollPos[posKey] || 0);
   }
+
+  const scrollPos = {};
+  let curPosKey = null;
+  addEventListener("scroll", () => { if (curPosKey) scrollPos[curPosKey] = scrollY; }, { passive: true });
+  const qbar = document.createElement("nav");
+  qbar.className = "qbar"; qbar.hidden = true; document.body.appendChild(qbar);
+  const sheet = document.createElement("div"); document.body.appendChild(sheet);
+  const closeToc = () => { sheet.innerHTML = ""; };
+  function openToc() {
+    const heads = [...document.querySelectorAll("#panel .md h2, #panel .md h3, #panel .md .q-anchor")];
+    const fs = store.get("fs", 1);
+    sheet.innerHTML = `<div class="sheet-bg"></div><div class="sheet" role="dialog" aria-label="目次"><div class="wrap">
+      <div class="grab"></div>
+      <div class="fsrow"><span>文字</span><button data-fs="-1">A−</button><button data-fs="0">標準</button><button data-fs="1">A＋</button><span class="num">${Math.round(fs * 100)}%</span></div>
+      <h3>目次</h3>
+      <div class="toc">${heads.length ? heads.map(h => {
+        const cls = h.classList.contains("q-anchor") ? "qs" : (h.tagName === "H3" ? "lv3" : "");
+        const t = h.classList.contains("q-anchor") ? h.querySelector("strong").textContent : h.textContent;
+        return `<a href="#" data-to="${h.id}" class="${cls}">${esc(t)}</a>`;
+      }).join("") : '<p class="sub">見出しがありません。</p>'}</div>
+    </div></div>`;
+    sheet.querySelector(".sheet-bg").onclick = closeToc;
+    sheet.querySelectorAll("[data-to]").forEach(a => a.onclick = ev => {
+      ev.preventDefault(); closeToc(); document.getElementById(a.dataset.to).scrollIntoView({ block: "start" });
+    });
+    sheet.querySelectorAll("[data-fs]").forEach(b => b.onclick = () => {
+      const d = +b.dataset.fs, cur = store.get("fs", 1);
+      const v = d === 0 ? 1 : Math.min(1.4, Math.max(0.8, Math.round((cur + d * 0.1) * 10) / 10));
+      store.set("fs", v); applyFs(); openToc();
+    });
+  }
+  const applyFs = () => document.documentElement.style.setProperty("--fs", store.get("fs", 1));
+  applyFs();
 
   function viewNotFound() { $app.innerHTML = `<p class="sub">ページが見つかりません。<a href="#/">トップへ</a></p>`; }
 
   function route() {
+    closeToc(); qbar.hidden = true; document.body.classList.remove("in-q"); curPosKey = null;
     const [, id, no, tab] = location.hash.replace(/^#/, "").split("/");
     if (!id) return viewHome();
     if (!no) return viewExam(id);
