@@ -115,11 +115,11 @@ header.top { padding-top: env(safe-area-inset-top); }
 .qview .tabs { position: sticky; top: calc(56px + env(safe-area-inset-top)); z-index: 9; background: var(--bg); margin: 0 0 14px; }
 .qview .md h2, .qview .md h3, .qview .md .q-anchor { scroll-margin-top: calc(110px + env(safe-area-inset-top)); }
 .md .q-anchor { background: var(--accent-weak); border-radius: 8px; padding: 8px 10px; }
-body.in-q main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+body.in-q main { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 .qbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
-.qbar .wrap { display: flex; gap: 6px; align-items: center; height: 60px; }
-.qbar button, .qbar a { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; height: 44px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit; font-size: .85rem; font-weight: 500; cursor: pointer; text-decoration: none; touch-action: manipulation; white-space: nowrap; }
+.qbar .wrap { display: flex; gap: 6px; align-items: center; height: 52px; }
+.qbar button, .qbar a { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; height: 40px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-size: .85rem; font-weight: 500; cursor: pointer; text-decoration: none; touch-action: manipulation; white-space: nowrap; }
 .qbar .dis { opacity: .35; pointer-events: none; }
 .qbar .on { background: var(--ok-weak); border-color: var(--ok); color: var(--ok); }
 .sheet-bg { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.35); }
@@ -133,7 +133,13 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 .fsrow button { flex: 1; height: 40px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
 @media (max-width: 560px) {
   header.top .wrap { height: 50px; gap: 8px; }
-  .qview .tabs { top: calc(50px + env(safe-area-inset-top)); }
+  /* 問題ページではサイトのヘッダーを固定せず，タブだけを上に固定する */
+  body.in-q header.top { position: relative; }
+  .qview .tabs { top: 0; padding-top: env(safe-area-inset-top) !important; }
+  /* 下にスクロールして読んでいる間はタブと下部バーを隠し，上にスクロールすると出す */
+  .qview .tabs, .qbar { transition: transform .2s ease; }
+  body.reading .qview .tabs { transform: translateY(-100%); }
+  body.reading .qbar { transform: translateY(100%); }
   .brand { font-size: .98rem; }
   .brand small { display: none; }
   main { padding-top: 14px; }
@@ -149,11 +155,14 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   /* 本文は余白を詰めて全幅で読む */
   .qview .panel { padding: 4px 0; border: none; background: none; box-shadow: none; }
   .qview .tabs { margin: 0 -16px 10px; padding: 0 8px; }
-  .qview .tabs button { flex: 1; padding: 10px 6px; font-size: .9rem; }
+  .qview .tabs button { flex: 1; padding: 7px 6px; font-size: .85rem; }
   .qview .qhead { margin-bottom: 6px; }
+  .qview .crumbs { font-size: .78rem; margin-bottom: 2px; }
+  .qview h1.page { font-size: 1.02rem; }
   .qview .qhead .check { display: none; }
   .qview .pager { display: none; }
-  .md { line-height: 1.85; }
+  .md { line-height: 1.7; font-size: calc(15px * var(--fs, 1)); }
+  .md p { margin-bottom: 10px; }
   .md h1 { font-size: 1.05rem; }
   .md h2 { font-size: 1.02rem; margin: 24px 0 8px; }
   .md h3 { font-size: .96rem; }
@@ -363,7 +372,15 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 
   const scrollPos = {};
   let curPosKey = null;
-  addEventListener("scroll", () => { if (curPosKey) scrollPos[curPosKey] = scrollY; }, { passive: true });
+  let lastY = 0;
+  addEventListener("scroll", () => {
+    if (curPosKey) scrollPos[curPosKey] = scrollY;
+    // 読み進めている（下へスクロール）間はバーを隠す。上へ戻す・先頭付近・末尾付近では出す
+    const y = scrollY, d = y - lastY, nearEnd = y + innerHeight > document.documentElement.scrollHeight - 80;
+    if (y < 120 || nearEnd || d < -8) document.body.classList.remove("reading");
+    else if (d > 8) document.body.classList.add("reading");
+    if (Math.abs(d) > 8) lastY = y;
+  }, { passive: true });
   const qbar = document.createElement("nav");
   qbar.className = "qbar"; qbar.hidden = true; document.body.appendChild(qbar);
   const sheet = document.createElement("div"); document.body.appendChild(sheet);
@@ -397,7 +414,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   function viewNotFound() { $app.innerHTML = `<p class="sub">ページが見つかりません。<a href="#/">トップへ</a></p>`; }
 
   function route() {
-    closeToc(); qbar.hidden = true; document.body.classList.remove("in-q"); curPosKey = null;
+    closeToc(); qbar.hidden = true; document.body.classList.remove("in-q", "reading"); curPosKey = null;
     const [, id, no, tab] = location.hash.replace(/^#/, "").split("/");
     if (!id) return viewHome();
     if (!no) return viewExam(id);
