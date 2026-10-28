@@ -103,6 +103,11 @@ h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
 .md th { background: var(--surface2); font-weight: 700; white-space: nowrap; }
 .md td + td, .md th + th { border-left: 1px solid var(--border); }
 .md hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+/* 1文ずつ区切って表示（目次・文字シートで切替） */
+.md .sn { display: block; }
+.md .sn + .sn { margin-top: .55em; }
+/* 空欄［ a ］を目立たせる */
+.md .blank { display: inline-block; min-width: 2.2em; text-align: center; padding: 0 .3em; margin: 0 .1em; border: 1.5px solid var(--accent); border-radius: 5px; color: var(--accent); font-weight: 700; line-height: 1.35; }
 .md u { text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 .j-ok { color: var(--ok); font-weight: 700; } .j-mid { color: var(--mid); font-weight: 700; } .j-ng { color: var(--ng); font-weight: 700; }
 footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; padding: 20px 0 40px; }
@@ -130,6 +135,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 .toc a.lv3 { padding-left: 18px; font-size: .86rem; color: var(--muted); }
 .toc a.qs { font-weight: 700; color: var(--accent); }
 .fsrow { display: flex; gap: 8px; align-items: center; margin: 4px 0 14px; font-size: .88rem; color: var(--muted); }
+.fsrow button.on { border-color: var(--accent); color: var(--accent); background: var(--accent-weak); }
 .fsrow button { flex: 1; height: 40px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
 @media (max-width: 560px) {
   header.top .wrap { height: 50px; gap: 8px; }
@@ -161,8 +167,9 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   .qview h1.page { font-size: 1.02rem; }
   .qview .qhead .check { display: none; }
   .qview .pager { display: none; }
-  .md { line-height: 1.7; font-size: calc(15px * var(--fs, 1)); }
-  .md p { margin-bottom: 10px; }
+  .md { line-height: 1.9; font-size: calc(16px * var(--fs, 1)); }
+  .md p { margin-bottom: 1.3em; }
+  .md li { margin-bottom: .5em; }
   .md h1 { font-size: 1.05rem; }
   .md h2 { font-size: 1.02rem; margin: 24px 0 8px; }
   .md h3 { font-size: .96rem; }
@@ -350,12 +357,12 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
       try {
         if (tab === "mondai") {
           panel.innerHTML = render(await load(`${id}/mondai_q${no}.md`));
-          restore();
+          tidy(panel); restore();
         } else {
           const file = tab === "kaisetsu" ? "kaitou_kaisetsu.md" : "shougou.md";
           const sec = splitSections(await load(`${id}/${file}`)).q[no];
           panel.innerHTML = sec ? render(sec) : `<p class="sub">まだ用意されていません。</p>`;
-          restore();
+          tidy(panel); restore();
         }
       } catch (err) { panel.innerHTML = `<p class="err">読み込みに失敗しました：${esc(err.message)}</p>`; }
     };
@@ -385,12 +392,22 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   qbar.className = "qbar"; qbar.hidden = true; document.body.appendChild(qbar);
   const sheet = document.createElement("div"); document.body.appendChild(sheet);
   const closeToc = () => { sheet.innerHTML = ""; };
+  // 段落を「。」ごとに区切り，空欄を枠で囲む
+  function tidy(root) {
+    root.querySelectorAll(".md p").forEach(p => {
+      p.innerHTML = p.innerHTML.replace(/［\s*([^］<]{1,6}?)\s*］/g, '<span class="blank">$1</span>');
+      if (!store.get("split", true) || p.closest("td, blockquote") || p.classList.contains("q-anchor")) return;
+      const parts = p.innerHTML.split(/(?<=。)(?![」）』\)]|<\/)/);
+      if (parts.length > 1) p.innerHTML = parts.filter(x => x.trim()).map(x => `<span class="sn">${x}</span>`).join("");
+    });
+  }
   function openToc() {
     const heads = [...document.querySelectorAll("#panel .md h2, #panel .md h3, #panel .md .q-anchor")];
     const fs = store.get("fs", 1);
     sheet.innerHTML = `<div class="sheet-bg"></div><div class="sheet" role="dialog" aria-label="目次"><div class="wrap">
       <div class="grab"></div>
       <div class="fsrow"><span>文字</span><button data-fs="-1">A−</button><button data-fs="0">標準</button><button data-fs="1">A＋</button><span class="num">${Math.round(fs * 100)}%</span></div>
+      <div class="fsrow"><span>改行</span><button data-split="1" class="${store.get("split", true) ? "on" : ""}">1文ずつ</button><button data-split="0" class="${store.get("split", true) ? "" : "on"}">原文どおり</button></div>
       <h3>目次</h3>
       <div class="toc">${heads.length ? heads.map(h => {
         const cls = h.classList.contains("q-anchor") ? "qs" : (h.tagName === "H3" ? "lv3" : "");
@@ -401,6 +418,9 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     sheet.querySelector(".sheet-bg").onclick = closeToc;
     sheet.querySelectorAll("[data-to]").forEach(a => a.onclick = ev => {
       ev.preventDefault(); closeToc(); document.getElementById(a.dataset.to).scrollIntoView({ block: "start" });
+    });
+    sheet.querySelectorAll("[data-split]").forEach(b => b.onclick = () => {
+      store.set("split", b.dataset.split === "1"); closeToc(); route();
     });
     sheet.querySelectorAll("[data-fs]").forEach(b => b.onclick = () => {
       const d = +b.dataset.fs, cur = store.get("fs", 1);
