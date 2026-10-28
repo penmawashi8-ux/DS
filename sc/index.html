@@ -98,6 +98,10 @@ h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
 .md pre code { background: none; padding: 0; font-size: .8rem; white-space: pre; }
 /* 罫線の図：1文字ずつ固定幅のマスに置いて，全角2マス・半角1マスで揃える */
 .md pre.diagram { line-height: 1.25; position: relative; }
+/* 図は IPA の問題冊子から切り出した画像。タップで原寸を開く */
+.md a.fig { display: block; margin: 12px 0 4px; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 6px; }
+.md a.fig img { display: block; width: 100%; height: auto; }
+.md .fighint { font-size: .75rem; color: var(--muted); margin: 0 0 12px; }
 .md pre.diagram.wide::after { content: "← 横にスクロールできます →"; position: sticky; left: 0; display: block; margin-top: 6px; font-size: 11px; color: var(--muted); font-family: "Noto Sans JP", sans-serif; }
 .diagram .ln { display: block; white-space: nowrap; height: 1.25em; }
 .diagram .c { display: inline-flex; justify-content: center; width: var(--cw); overflow: visible; font-family: "Noto Sans JP", system-ui, sans-serif; }
@@ -256,6 +260,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   const splitQuotes = md => md.replace(/^(>[ \t]*\S.*)\n(?=>[ \t]*\S)/gm, "$1\n>\n");
   const render = md => {
     const html = marked.parse(escapeRawHtml(splitQuotes(md)))
+      .replace(/<p><img src="([^"]+)" alt="([^"]*)"\s*\/?><\/p>/g, '<a class="fig" href="$1" target="_blank" rel="noopener"><img src="$1" alt="$2" loading="lazy"></a><p class="fighint">タップで拡大</p>')
       .replace(/<table>/g, '<div class="tbl"><table>').replace(/<\/table>/g, "</table></div>")
       .replace(/(<td>\s*)(<strong>)?(◎|○)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ok">$3</span>$5')
       .replace(/(<td>\s*)(<strong>)?(△)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-mid">$3</span>$5')

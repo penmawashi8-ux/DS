@@ -4,6 +4,7 @@
 - `sc/` … 情報処理安全確保支援士 午後 過去問解説サイト（新形式：令和5年度秋期〜）
   - `sc/index.html` … サイト本体。`sc/manifest.json` と各回の Markdown を読み込んで表示する
   - `sc/<回ID>/mondai_q1〜q4.md` … 問題文の書き起こし（IPA公開の画像PDFから）
+  - `sc/<回ID>/fig/` … 問題文の図（IPA公開の問題冊子PDFから切り出した画像。`scripts/crop_sc_figures.py` で生成）
   - `sc/<回ID>/kaitou_kaisetsu.md` … 解答と解説（公式解答例と照合し，ずれていた箇所は公式に沿って修正済み）
   - `sc/<回ID>/shougou.md` … IPA公式解答例との照合結果
   - 回ID は IPA のファイル名に合わせた `2024r06h`（h＝春期、a＝秋期）形式
