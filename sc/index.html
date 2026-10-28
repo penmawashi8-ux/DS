@@ -102,6 +102,7 @@ h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
 .diagram .ln { display: block; white-space: nowrap; height: 1.25em; }
 .diagram .c { display: inline-flex; justify-content: center; width: var(--cw); overflow: visible; font-family: "Noto Sans JP", system-ui, sans-serif; }
 .diagram .c.w { width: calc(var(--cw) * 2); }
+.diagram .dblank { color: var(--accent); font-weight: 700; }
 /* 図表中の文章：元の改行位置で折れていた行をつないで，普通の文章として折り返す */
 .md .figtext { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin: 0 0 14px; white-space: pre-wrap; font-size: .92em; line-height: 1.75; overflow-wrap: anywhere; }
 .tbl { overflow-x: auto; margin: 0 0 14px; border: 1px solid var(--border); border-radius: 8px; }
@@ -240,8 +241,11 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     return cache[path];
   };
   marked.setOptions({ gfm: true, breaks: false });
+  // 本文中の「<script>」などはタグとしてではなく文字として表示する（書式用の u/sup/sub/br だけ通す）
+  const escapeRawHtml = md => md.split(/(^```[\s\S]*?^```)/m).map((part, i) => i % 2 ? part :
+    part.split(/(`[^`\n]*`)/).map((t, j) => j % 2 ? t : t.replace(/<(?!\/?(?:u|sup|sub|br)\b[^>]*>)/gi, "&lt;")).join("")).join("");
   const render = md => {
-    const html = marked.parse(md)
+    const html = marked.parse(escapeRawHtml(md))
       .replace(/<table>/g, '<div class="tbl"><table>').replace(/<\/table>/g, "</table></div>")
       .replace(/(<td>\s*)(<strong>)?(◎|○)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ok">$3</span>$5')
       .replace(/(<td>\s*)(<strong>)?(△)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-mid">$3</span>$5')
@@ -445,7 +449,8 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
         else lines.push(line.replace(/\s+$/, ""));
       }
       const div = document.createElement("div");
-      div.className = "figtext"; div.textContent = lines.join("\n");
+      div.className = "figtext";
+      div.innerHTML = esc(lines.join("\n")).replace(/［\s*([^］\n]{1,6}?)\s*］/g, '<span class="blank">$1</span>');
       pre.replaceWith(div);
     });
   }
@@ -473,6 +478,20 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     const targets = {};
     const put = (k, el) => { if (!targets[k]) { if (!el.id) el.id = "t" + Math.random().toString(36).slice(2, 8); targets[k] = el.id; } };
     for (const el of body) {
+      el.querySelectorAll(".diagram .ln").forEach(ln => {
+        const cells = [...ln.children], text = cells.map(c => c.textContent).join("");
+        for (const m of text.matchAll(/［[\s\u00a0]*([^］\s\u00a0]{1,6})[\s\u00a0]*］/g)) {
+          const k = "bl:" + m[1];
+          if (targets[k]) continue;
+          const from = [...text.slice(0, m.index)].length, to = from + [...m[0]].length;
+          cells.slice(from, to).forEach(c => c.classList.add("dblank"));
+          put(k, cells[from]);
+        }
+      });
+      // ソースコードや設定例の中の空欄も枠で囲んで飛び先にする
+      el.querySelectorAll("pre:not(.diagram) code").forEach(code => {
+        if (/［/.test(code.textContent)) code.innerHTML = code.innerHTML.replace(/［\s*([^］\s]{1,6})\s*］/g, '<span class="blank">$1</span>');
+      });
       el.querySelectorAll(".blank").forEach(b => put("bl:" + b.textContent.trim(), b));
       if (el.tagName === "H2") put("sec:" + el.textContent.trim(), el);
       const st = el.tagName === "P" && el.firstElementChild && el.firstElementChild.tagName === "STRONG" ? el.firstElementChild.textContent.trim() : "";
@@ -480,26 +499,28 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
       // 丸数字（下線の番号）は最初に出てきた箇所を囲む
       const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
-      for (const t of nodes) {
-        let m;
-        while ((m = /[\u2460-\u2473]/.exec(t.nodeValue)) && !targets["ul:" + m[0]]) {
-          const span = document.createElement("span"); span.className = "ulmark";
-          const rest = t.splitText(m.index); rest.splitText(1);
-          const u = rest.parentElement.closest("u") || rest.parentElement;
-          rest.replaceWith(span); span.appendChild(rest);
-          put("ul:" + m[0], u.tagName === "U" ? u : span);
-          break;
+      for (let t of nodes) {
+        for (;;) {
+          const m = [...t.nodeValue.matchAll(/[\u2460-\u2473]/g)].find(x => !targets["ul:" + x[0]]);
+          if (!m) break;
+          const mark = t.splitText(m.index), after = mark.splitText(1);
+          const u = mark.parentElement.closest("u");
+          if (u) put("ul:" + m[0], u);
+          else { const span = document.createElement("span"); mark.replaceWith(span); span.appendChild(mark); put("ul:" + m[0], span); }
+          t = after;
         }
       }
     }
     const link = (k, text) => targets[k] ? `<a href="#" class="ref" data-to="${targets[k]}">${text}</a>` : text;
     for (const el of qs) [...(el.matches("p, li") ? [el] : []), ...el.querySelectorAll("p, li")].forEach(x => {
-      if (x.querySelector("p, li")) return;
-      x.innerHTML = x.innerHTML
+      if (x.querySelector("p")) return;
+      // 入れ子のリスト（解答群など）がある項目は，その手前の本文だけを対象にする
+      const html = x.innerHTML, cut = html.search(/<(ul|ol)\b/), head = cut < 0 ? html : html.slice(0, cut);
+      x.innerHTML = head
         .replace(/下線([\u2460-\u2473])/g, (m, c) => link("ul:" + c, m))
-        .replace(/(?<![\w>])([表図]\d+)/g, (m, f) => link("fig:" + f, m))
+        .replace(/(?<![\w"=])([表図]\d+)(?![^<]*>)/g, (m, f) => link("fig:" + f, m))
         .replace(/〔[^〕<]+〕/g, m => link("sec:" + m, m))
-        .replace(/<span class="blank">([^<]+)<\/span>/g, (m, b) => link("bl:" + b.trim(), m));
+        .replace(/<span class="blank">([^<]+)<\/span>/g, (m, b) => link("bl:" + b.trim(), m)) + (cut < 0 ? "" : html.slice(cut));
     });
     md.querySelectorAll("a.ref").forEach(a => a.onclick = ev => {
       ev.preventDefault();
