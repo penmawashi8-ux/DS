@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SC午後">
 <title>SC午後 過去問解説</title>
-<meta name="description" content="情報処理安全確保支援士試験 午後（新形式）の過去問を、問題文の書き起こし・自作解答と解説・公式解答例との照合で整理した学習サイト">
+<meta name="description" content="情報処理安全確保支援士試験 午後（新形式）の過去問を、問題文の書き起こし・解答と解説・公式解答例との照合で整理した学習サイト">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="vendor/marked.min.js"></script>
@@ -274,15 +274,15 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     const judged = jt["◎"] + jt["○"] + jt["△"] + jt["×"];
     const rate = judged ? Math.round((jt["◎"] + jt["○"]) / judged * 100) : 0;
     let html = `<h1 class="page">情報処理安全確保支援士 午後 過去問解説</h1>
-      <p class="sub">新形式（令和5年度秋期〜）の午後問題を、問題文の書き起こし、<b>答えを見ずに書いた解答と解説</b>、IPA公式解答例との照合の3点セットで掲載しています。</p>
+      <p class="sub">新形式（令和5年度秋期〜）の午後問題を、問題文の書き起こし、<b>公式解答例に沿った解答と解説</b>、公式解答例との照合（初回に答えを見ずに解いたときの読み違いの記録）の3点セットで掲載しています。</p>
       <div class="stats">
         <div class="stat"><b>${exams.length}</b><span>回分</span></div>
         <div class="stat"><b>${nq}</b><span>問</span></div>
-        <div class="stat"><b>${rate}%</b><span>自作解答が公式と要点一致（◎＋○）</span></div>
+        <div class="stat"><b>${rate}%</b><span>初回の解答が公式と要点一致（◎＋○）</span></div>
         <div class="stat"><b>${nd} / ${nq}</b><span>あなたが解いた問題</span></div>
       </div>
       <input class="search" id="q" type="search" placeholder="テーマや題材で絞り込み（例：JWT、DNS、ログ）" value="${esc(filter)}">
-      <div class="legend"><span><i style="background:var(--ok)"></i>◎一致</span><span><i style="background:color-mix(in srgb,var(--ok) 55%,var(--surface2))"></i>○要点同じ</span><span><i style="background:var(--mid)"></i>△ずれ</span><span><i style="background:var(--ng)"></i>×不一致</span><span>（自作解答と公式解答例の照合結果）</span></div>`;
+      <div class="legend"><span><i style="background:var(--ok)"></i>◎一致</span><span><i style="background:color-mix(in srgb,var(--ok) 55%,var(--surface2))"></i>○要点同じ</span><span><i style="background:var(--mid)"></i>△ずれ</span><span><i style="background:var(--ng)"></i>×不一致</span><span>（初回の解答と公式解答例の照合結果。△×の箇所は解説を公式に沿って修正済み）</span></div>`;
     let shown = 0;
     for (const e of exams) {
       const qs = e.questions.filter(q => !f || (q.theme + q.lead).toLowerCase().includes(f));
