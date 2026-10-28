@@ -253,8 +253,10 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   // 本文中の「<script>」などはタグとしてではなく文字として表示する（書式用の u/sup/sub/br だけ通す）
   const escapeRawHtml = md => md.split(/(^```[\s\S]*?^```)/m).map((part, i) => i % 2 ? part :
     part.split(/(`[^`\n]*`)/).map((t, j) => j % 2 ? t : t.replace(/<(?!\/?(?:u|sup|sub|br)\b[^>]*>)/gi, "&lt;")).join("")).join("");
+  // 引用の連続行（「> 本文：…」の並び）は1行ずつ段落に分けて，つながって読みにくくならないようにする
+  const splitQuotes = md => md.replace(/^(>[ \t]*\S.*)\n(?=>[ \t]*\S)/gm, "$1\n>\n");
   const render = md => {
-    const html = marked.parse(escapeRawHtml(md))
+    const html = marked.parse(escapeRawHtml(splitQuotes(md)))
       .replace(/<table>/g, '<div class="tbl"><table>').replace(/<\/table>/g, "</table></div>")
       .replace(/(<td>\s*)(<strong>)?(◎|○)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ok">$3</span>$5')
       .replace(/(<td>\s*)(<strong>)?(△)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-mid">$3</span>$5')

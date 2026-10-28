@@ -336,7 +336,7 @@ dとeで応答が変わる＝条件の真偽で応答が変わるので，ブラ
 **答え**：URLを確認する手段がない。
 
 #### 設問4(2)　［読解］
-> 本文：図8「f-app://campaign?**url=**https://www.a-sha.co.jp/campaign/□□□」
+> 本文：図8「f-app://campaign?url=https://www.a-sha.co.jp/campaign/□□□」
 > 本文：Sさん「そもそも**フィッシングサイトにアクセスできないようにする機能**が必要」
 
 **考え方**：図7の修正はgetToken関数（トークンを渡すかどうか）の話。アクセス自体を止めるには，F-URLのurlパラメータをWebViewに渡す前に，自社のURL（末尾の「/」まで含めて `https://www.a-sha.co.jp/`）で始まるかを確かめ，違えば開かない。
