@@ -122,6 +122,15 @@ h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
 @keyframes flash { 0%, 60% { background: color-mix(in srgb, var(--mid) 35%, transparent); } 100% { background: transparent; } }
 .md .flash { animation: flash 2.2s ease-out; border-radius: 4px; }
 .backbtn { position: fixed; right: 14px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 25; border: none; border-radius: 999px; padding: 10px 16px; background: var(--accent); color: #fff; font: inherit; font-size: .88rem; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.25); cursor: pointer; }
+.md h4 { font-size: 1rem; margin: 26px 0 8px; padding-top: 14px; border-top: 1px dashed var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.md .kind { font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
+.md .k-read { background: var(--accent-weak); color: var(--accent); }
+.md .k-know { background: var(--mid-weak); color: var(--mid); }
+.md p.lbl strong.tl { display: inline-block; font-size: .75rem; padding: 0 7px; margin-right: 6px; border-radius: 5px; vertical-align: 1px; }
+.md p.lbl-think strong.tl { background: var(--surface2); color: var(--text); }
+.md p.lbl-know strong.tl { background: var(--mid-weak); color: var(--mid); }
+.md p.lbl-ans { background: var(--ok-weak); border-left: 3px solid var(--ok); padding: 8px 12px; border-radius: 0 8px 8px 0; font-weight: 500; }
+.md p.lbl-ans strong.tl { background: var(--ok); color: #fff; }
 .md u { text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 .j-ok { color: var(--ok); font-weight: 700; } .j-mid { color: var(--mid); font-weight: 700; } .j-ng { color: var(--ng); font-weight: 700; }
 footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; padding: 20px 0 40px; }
@@ -132,7 +141,7 @@ header.top { padding-top: env(safe-area-inset-top); }
 .wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
 .md { font-size: calc(1rem * var(--fs, 1)); }
 .qview .tabs { position: sticky; top: calc(56px + env(safe-area-inset-top)); z-index: 9; background: var(--bg); margin: 0 0 14px; }
-.qview .md h2, .qview .md h3, .qview .md .q-anchor { scroll-margin-top: calc(110px + env(safe-area-inset-top)); }
+.qview .md h2, .qview .md h3, .qview .md h4, .qview .md .q-anchor { scroll-margin-top: calc(110px + env(safe-area-inset-top)); }
 .md .q-anchor { background: var(--accent-weak); border-radius: 8px; padding: 8px 10px; }
 body.in-q main { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
@@ -252,7 +261,10 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
       .replace(/(<td>\s*)(<strong>)?(×)(<\/strong>)?(\s*<\/td>)/g, '$1<span class="j-ng">$3</span>$5');
     let n = 0;
     const out = html
-      .replace(/<h([23])>/g, (m, lv) => `<h${lv} id="s${n++}">`)
+      .replace(/<h([234])>/g, (m, lv) => `<h${lv} id="s${n++}">`)
+      // 解説：設問ごとの［読解］［知識］をバッジに，「答え」「考え方」などの段落に目印を付ける
+      .replace(/［(読解|知識)］/g, (m, t) => `<span class="kind ${t === "知識" ? "k-know" : "k-read"}">${t}</span>`)
+      .replace(/<p><strong>(答え|考え方|知識)<\/strong>：?/g, (m, t) => `<p class="lbl lbl-${{ 答え: "ans", 考え方: "think", 知識: "know" }[t]}"><strong class="tl">${t}</strong>`)
       .replace(/<p><strong>(設問\s*\d+)<\/strong>/g, (m, t) => `<p class="q-anchor" id="s${n++}"><strong>${t}</strong>`);
     return '<div class="md">' + out + "</div>";
   };
@@ -535,7 +547,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   backBtn.className = "backbtn"; backBtn.hidden = true; backBtn.textContent = "↩ 設問に戻る";
   document.body.appendChild(backBtn);
   function openToc() {
-    const heads = [...document.querySelectorAll("#panel .md h2, #panel .md h3, #panel .md .q-anchor")];
+    const heads = [...document.querySelectorAll("#panel .md h2, #panel .md h3, #panel .md h4, #panel .md .q-anchor")];
     const fs = store.get("fs", 1);
     sheet.innerHTML = `<div class="sheet-bg"></div><div class="sheet" role="dialog" aria-label="目次"><div class="wrap">
       <div class="grab"></div>
@@ -543,7 +555,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
       <div class="fsrow"><span>改行</span><button data-split="1" class="${store.get("split", true) ? "on" : ""}">1文ずつ</button><button data-split="0" class="${store.get("split", true) ? "" : "on"}">原文どおり</button></div>
       <h3>目次</h3>
       <div class="toc">${heads.length ? heads.map(h => {
-        const cls = h.classList.contains("q-anchor") ? "qs" : (h.tagName === "H3" ? "lv3" : "");
+        const cls = h.classList.contains("q-anchor") ? "qs" : (h.tagName === "H2" ? "" : "lv3");
         const t = h.classList.contains("q-anchor") ? h.querySelector("strong").textContent : h.textContent;
         return `<a href="#" data-to="${h.id}" class="${cls}">${esc(t)}</a>`;
       }).join("") : '<p class="sub">見出しがありません。</p>'}</div>
