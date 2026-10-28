@@ -165,9 +165,8 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   /* 問題ページではサイトのヘッダーを固定せず，タブだけを上に固定する */
   body.in-q header.top { position: relative; }
   .qview .tabs { top: 0; padding-top: env(safe-area-inset-top) !important; }
-  /* 下にスクロールして読んでいる間はタブと下部バーを隠し，上にスクロールすると出す */
-  .qview .tabs, .qbar { transition: transform .2s ease; }
-  body.reading .qview .tabs { transform: translateY(-100%); }
+  /* タブは常に表示する。下部バーだけ，下にスクロールして読んでいる間は隠し，上にスクロールすると出す */
+  .qbar { transition: transform .2s ease; }
   body.reading .qbar { transform: translateY(100%); }
   .brand { font-size: .98rem; }
   .brand small { display: none; }
