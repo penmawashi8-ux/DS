@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SC午後">
 <title>SC午後 過去問解説</title>
-<meta name="description" content="情報処理安全確保支援士試験 午後（新形式）の過去問を、問題文の書き起こし・解答と解説・公式解答例との照合で整理した学習サイト">
+<meta name="description" content="情報処理安全確保支援士試験 午後の過去問（令和3年度〜）を、問題文の書き起こし・解答と解説・公式解答例で整理した学習サイト">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="vendor/marked.min.js"></script>
@@ -310,7 +310,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     const judged = jt["◎"] + jt["○"] + jt["△"] + jt["×"];
     const rate = judged ? Math.round((jt["◎"] + jt["○"]) / judged * 100) : 0;
     let html = `<h1 class="page">情報処理安全確保支援士 午後 過去問解説</h1>
-      <p class="sub">新形式（令和5年度秋期〜）の午後問題を、問題文の書き起こし、<b>公式解答例に沿った解答と解説</b>、公式解答例との照合（初回に答えを見ずに解いたときの読み違いの記録）の3点セットで掲載しています。</p>
+      <p class="sub">令和3年度〜令和7年度の午後問題（令和5年度春期までは午後I・午後II）を、問題文の書き起こし、<b>公式解答例に沿った解答と解説</b>、公式解答例（新形式は初回に答えを見ずに解いたときの照合記録つき）の3点セットで掲載しています。</p>
       <div class="stats">
         <div class="stat"><b>${exams.length}</b><span>回分</span></div>
         <div class="stat"><b>${nq}</b><span>問</span></div>
@@ -343,14 +343,14 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     const e = manifest.exams.find(x => x.id === id);
     if (!e) return viewNotFound();
     let html = `<div class="crumbs"><a href="#/">トップ</a> / ${esc(e.label)}</div>
-      <h1 class="page">${esc(e.label)} 午後</h1><p class="sub">問1〜問4から2問選択。</p><div class="grid" style="margin-bottom:22px">`;
+      <h1 class="page">${esc(e.label)}</h1><p class="sub">${esc(e.note || "")}</p><div class="grid" style="margin-bottom:22px">`;
     for (const q of e.questions) html += `<a class="card" href="#/${e.id}/${q.no}"><div class="qno">問${q.no}</div><div class="theme">${esc(q.theme)}</div><div class="lead">${esc(q.lead)}</div>${judgeBar(q.judge)}</a>`;
     html += `</div>`;
-    $app.innerHTML = html + `<div class="panel"><p class="sub">照合の総括を読み込み中…</p></div>`;
+    $app.innerHTML = html + `<div class="panel"><p class="sub">読み込み中…</p></div>`;
     try {
       const sh = splitSections(await load(`${id}/shougou.md`));
       $app.innerHTML = html + `<div class="panel">${render(sh.head + sh.common.join(""))}</div>
-        <p class="sub" style="margin-top:14px">原本：<a href="../pdf/${id}_sc_pm_qs.pdf">問題PDF</a> ・ <a href="../pdf/${id}_sc_pm_ans.pdf">解答例PDF</a></p>`;
+        <p class="sub" style="margin-top:14px">原本：<a href="../pdf/${e.pdf}_qs.pdf">問題PDF</a> ・ <a href="../pdf/${e.pdf}_ans.pdf">解答例PDF</a></p>`;
     } catch (err) {
       $app.innerHTML = html + `<div class="panel"><p class="sub">照合結果はまだありません。</p></div>`;
     }
@@ -362,7 +362,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     if (!q) return viewNotFound();
     const idx = e.questions.indexOf(q);
     const prev = e.questions[idx - 1], next = e.questions[idx + 1];
-    const tabs = [["mondai", "問題文"], ["kaisetsu", "解答・解説"], ["shougou", "公式との照合"]];
+    const tabs = [["mondai", "問題文"], ["kaisetsu", "解答・解説"], ["shougou", e.compareLabel || "公式との照合"]];
     tab = tabs.some(t => t[0] === tab) ? tab : "mondai";
     const done = store.get(doneKey(id, no), false);
     $app.innerHTML = `<div class="qview"><div class="crumbs"><a href="#/">トップ</a> / <a href="#/${id}">${esc(e.label)}</a> / 問${no}</div>

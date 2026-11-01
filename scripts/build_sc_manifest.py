@@ -2,6 +2,7 @@
 """sc/<exam-id>/ 配下の Markdown を走査して sc/manifest.json を生成する。
 
 exam-id は IPA のファイル名に合わせた "2024r06h"（h=春期, a=秋期）形式。
+令和5年度春期までの旧形式は午後I・午後IIを別の回として "2023r05h-pm1" / "2023r05h-pm2" とする。
 """
 import json
 import re
@@ -12,12 +13,31 @@ SEASON = {"h": "春期", "a": "秋期"}
 JUDGE_RE = re.compile(r"\|\s*\**\s*(◎|○|△|×)\s*\**\s*\|\s*$")
 
 
-def exam_label(exam_id):
-    m = re.fullmatch(r"(\d{4})r(\d{2})([ha])", exam_id)
+PART = {None: "午後", "1": "午後I", "2": "午後II"}
+NOTE = {None: "問1〜問4から2問選択。", "1": "問1〜問3から2問選択。", "2": "問1・問2から1問選択。"}
+EXAM_RE = re.compile(r"(\d{4})r(\d{2})([ha])(?:-pm([12]))?")
+
+
+def exam_info(exam_id):
+    m = EXAM_RE.fullmatch(exam_id)
     if not m:
-        return exam_id
-    year, reiwa, season = m.groups()
-    return f"令和{int(reiwa)}年度 {SEASON[season]}（{year}）"
+        return {"label": exam_id, "part": "午後", "note": "", "pdf": exam_id + "_sc_pm"}
+    year, reiwa, season, pm = m.groups()
+    return {
+        "label": f"令和{int(reiwa)}年度 {SEASON[season]}（{year}） {PART[pm]}",
+        "part": PART[pm],
+        "note": NOTE[pm],
+        "pdf": f"{year}r{reiwa}{season}_sc_pm{pm or ''}",
+    }
+
+
+def exam_order(d):
+    """新しい回から。同じ年度は秋期を春期より後，午後I→午後IIの順。"""
+    m = EXAM_RE.fullmatch(d.name)
+    if not m:
+        return (d.name, 0, 0)
+    year, reiwa, season, pm = m.groups()
+    return (year, season == "a", -int(pm or 0))
 
 
 def theme_of(md):
@@ -60,7 +80,7 @@ def judge_counts(section):
 
 def main():
     exams = []
-    for d in sorted((p for p in ROOT.iterdir() if p.is_dir()), reverse=True):
+    for d in sorted((p for p in ROOT.iterdir() if p.is_dir()), key=exam_order, reverse=True):
         qfiles = sorted(d.glob("mondai_q*.md"))
         if not qfiles:
             continue
@@ -78,9 +98,11 @@ def main():
             })
         exams.append({
             "id": d.name,
-            "label": exam_label(d.name),
+            **exam_info(d.name),
             "hasAnswer": (d / "kaitou_kaisetsu.md").exists(),
             "hasCompare": bool(shougou),
+            # 自作解答との照合（◎○△×）があれば「公式との照合」，なければ公式解答例・講評だけ
+            "compareLabel": "公式との照合" if any(judge_counts(shougou).values()) else "公式解答・講評",
             "questions": questions,
         })
     out = ROOT / "manifest.json"
