@@ -1,0 +1,36 @@
+name: Fetch SC afternoon PDFs (old format)
+
+# 令和3年度春期〜令和5年度春期の午後I・午後II（問題・解答例・採点講評）を取得する
+on:
+  push:
+    branches: [claude/kanto-factory-tours-no-reservation-f34hg5]
+    paths: [.github/workflows/fetch-sc-pm-old.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download PDFs listed in pdf/_found_urls.txt
+        run: |
+          set -u
+          mkdir -p pdf
+          grep -E '/(2021r03[ha]|2022r04[ha]|2023r05h)_sc_pm[12]_(qs|ans|cmnt)\.pdf$' pdf/_found_urls.txt > targets.txt
+          cat targets.txt
+          while read -r u; do
+            b=$(basename "$u")
+            [ -f "pdf/$b" ] && continue
+            curl -fsSL --retry 3 -A "Mozilla/5.0" -o "pdf/$b" "$u" && file "pdf/$b"
+          done < targets.txt
+          ls -la pdf
+      - name: Commit PDFs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pdf
+          git diff --cached --quiet || git commit -m "Add SC afternoon exam PDFs (old format, R3-R5 spring) from IPA"
+          git push
