@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SC午後 模試</title>
+<meta name="description" content="情報処理安全確保支援士 午後の過去問を本番形式（CBT想定：画面で読み，キーボードで記述）で解く模擬試験">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #fff; --surface2: #eef1f5; --border: #dde2e8;
+  --text: #1c2430; --muted: #5d6b7a; --accent: #1f6feb; --accent-weak: #e3edff;
+  --ok: #1a7f37; --ok-weak: #dcf5e3; --mid: #9a6700; --mid-weak: #fff3cd; --ng: #cf222e; --ng-weak: #ffe2e0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --surface: #161c25; --surface2: #1d2531; --border: #2b3544;
+    --text: #e6ebf1; --muted: #93a1b2; --accent: #58a6ff; --accent-weak: #15253d;
+    --ok: #3fb950; --ok-weak: #12301c; --mid: #d29922; --mid-weak: #33270b; --ng: #f85149; --ng-weak: #3b1513;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #161c25; --surface2: #1d2531; --border: #2b3544;
+  --text: #e6ebf1; --muted: #93a1b2; --accent: #58a6ff; --accent-weak: #15253d;
+  --ok: #3fb950; --ok-weak: #12301c; --mid: #d29922; --mid-weak: #33270b; --ng: #f85149; --ng-weak: #3b1513;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7; -webkit-text-size-adjust: 100%; }
+a { color: var(--accent); text-decoration: none; }
+button { font: inherit; cursor: pointer; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.4rem; margin: 8px 0 4px; }
+.sub { color: var(--muted); font-size: .9rem; margin: 0 0 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+.card h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.opts { display: grid; gap: 8px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.opt input { margin-top: 6px; }
+.opt small { display: block; color: var(--muted); }
+select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
+.btn { background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; font-weight: 700; }
+.btn.sec { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn:disabled { opacity: .5; cursor: default; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+ul.notes { margin: 0; padding-left: 1.2em; color: var(--muted); font-size: .88rem; }
+
+/* 試験画面 */
+.exam { display: flex; flex-direction: column; height: 100dvh; }
+.ebar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; padding-top: calc(8px + env(safe-area-inset-top)); background: var(--surface); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1.15rem; min-width: 5.5em; }
+.timer.low { color: var(--ng); }
+.qtabs { display: flex; gap: 4px; flex: 1; overflow-x: auto; }
+.qtab { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px; padding: 4px 10px; white-space: nowrap; font-size: .9rem; }
+.qtab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.qtab .sel { font-size: .75rem; margin-left: 4px; }
+.ebody { flex: 1; display: grid; grid-template-columns: 1.15fr 1fr; min-height: 0; }
+.pane { min-height: 0; display: flex; flex-direction: column; }
+.pane + .pane { border-left: 1px solid var(--border); }
+iframe { border: 0; width: 100%; flex: 1; background: var(--bg); }
+.ans { overflow-y: auto; padding: 12px 14px 80px; }
+.pick { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; background: var(--accent-weak); margin-bottom: 12px; font-size: .92rem; }
+.item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+.item.flag { border-color: var(--mid); box-shadow: inset 4px 0 0 var(--mid); }
+.item .ih { display: flex; gap: 8px; align-items: baseline; }
+.item .ih b { white-space: nowrap; }
+.item .q { font-size: .82rem; color: var(--muted); flex: 1; }
+.item textarea { width: 100%; min-height: 3.2em; margin-top: 6px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font: inherit; font-size: 16px; resize: vertical; }
+.item .meta { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); margin-top: 2px; }
+.cnt.over { color: var(--ng); font-weight: 700; }
+.flagbtn { border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 6px; font-size: .75rem; padding: 0 6px; }
+.item.flag .flagbtn { color: var(--mid); border-color: var(--mid); }
+.dis { opacity: .55; }
+.switch { display: none; }
+@media (max-width: 760px) {
+  .ebody { grid-template-columns: 1fr; }
+  .pane + .pane { border-left: 0; }
+  .ebody[data-view="q"] .pane.a, .ebody[data-view="a"] .pane.p { display: none; }
+  .switch { display: flex; position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px; gap: 4px; box-shadow: 0 4px 16px rgba(0,0,0,.18); z-index: 5; }
+  .switch button { border: 0; background: none; color: var(--text); border-radius: 999px; padding: 8px 18px; font-weight: 700; }
+  .switch button.on { background: var(--accent); color: #fff; }
+}
+
+/* 結果 */
+.res-item { border-top: 1px solid var(--border); padding: 10px 0; }
+.res-item:first-of-type { border-top: 0; }
+.res-k { font-weight: 700; }
+.res-q { color: var(--muted); font-size: .82rem; }
+.cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; }
+.cmp div { background: var(--surface2); border-radius: 8px; padding: 8px 10px; white-space: pre-wrap; font-size: .9rem; }
+.cmp div.off { background: var(--ok-weak); }
+.cmp div::before { display: block; font-size: .72rem; color: var(--muted); font-weight: 700; }
+.cmp div.mine::before { content: "あなたの解答"; }
+.cmp div.off::before { content: "公式解答例"; }
+@media (max-width: 560px) { .cmp { grid-template-columns: 1fr; } }
+.grade { display: flex; gap: 6px; }
+.grade button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 2px 12px; }
+.grade button.on[data-g="2"] { background: var(--ok); color: #fff; border-color: var(--ok); }
+.grade button.on[data-g="1"] { background: var(--mid); color: #fff; border-color: var(--mid); }
+.grade button.on[data-g="0"] { background: var(--ng); color: #fff; border-color: var(--ng); }
+.score { font-size: 2rem; font-weight: 700; }
+.hist td, .hist th { padding: 4px 8px; border-bottom: 1px solid var(--border); text-align: left; font-size: .88rem; }
+.hist { border-collapse: collapse; width: 100%; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(() => {
+  const $app = document.getElementById("app");
+  const KEY = "sc-mock-v1", HKEY = "sc-mock-hist-v1";
+  const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+               set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+  try { const t = localStorage.getItem("sc:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch {}
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // 形式：新形式（令和5年度秋期〜）は午後1本，旧形式は午後I・午後IIを別に解く
+  const FORMATS = {
+    pm:  { label: "午後（新形式）", minutes: 150, pick: 2, desc: "問1〜問4から2問選択・150分" },
+    pm1: { label: "午後I（旧形式）", minutes: 90, pick: 2, desc: "問1〜問3から2問選択・90分" },
+    pm2: { label: "午後II（旧形式）", minutes: 120, pick: 1, desc: "問1・問2から1問選択・120分" },
+  };
+  const fmtOf = e => /-pm1$/.test(e.id) ? "pm1" : /-pm2$/.test(e.id) ? "pm2" : "pm";
+  const load = p => fetch(p, { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(p); return r.text(); });
+  let manifest, st = ls.get(KEY, null), tick = null;
+  const save = () => ls.set(KEY, st);
+
+  // 問題文の「設問」部分から，解答欄（設問ごと・小問ごと）と字数制限を取り出す
+  function parseItems(md) {
+    const i = md.search(/^\*\*設問\s*\d/m);
+    if (i < 0) return [];
+    const items = []; let cur = null;
+    for (const line of md.slice(i).split("\n")) {
+      const m = line.match(/^\*\*設問\s*(\d+)\*\*\s*(.*)/);
+      if (m) { cur = { n: m[1], text: m[2] }; items.push({ key: `設問${m[1]}`, q: m[2], parent: true }); continue; }
+      const s = line.match(/^- \((\d+)\)\s*(.*)/);
+      if (s && cur) { items.push({ key: `設問${cur.n}(${s[1]})`, q: s[2] }); items.forEach(x => { if (x.key === `設問${cur.n}`) x.hasSub = true; }); }
+    }
+    return items.filter(x => !(x.parent && x.hasSub)).map(x => {
+      const m = x.q.match(/(\d+)字以内/g);
+      return { key: x.key, q: x.q.replace(/\*\*/g, ""), limit: m ? Math.max(...m.map(v => +v.match(/\d+/)[0])) : 0 };
+    });
+  }
+  // 解答・解説の先頭の表から公式解答を取り出す（設問キーで照合）
+  function parseOfficial(md) {
+    const rows = [];
+    for (const line of md.split("\n")) {
+      const m = line.match(/^\|\s*(設問[^|]*?)\s*\|\s*(.*?)\s*\|\s*$/);
+      if (m) rows.push({ key: m[1].replace(/\s+/g, " "), ans: m[2].replace(/<br>/g, "\n").replace(/\*\*|`/g, "").replace(/\\\|/g, "|") });
+    }
+    return rows;
+  }
+  function officialFor(rows, key) {
+    const hit = rows.filter(r => r.key === key || (r.key.startsWith(key) && !/^\d/.test(r.key.slice(key.length))));
+    if (hit.length) return hit.map(r => (r.key === key ? "" : r.key.slice(key.length).trim() + "：") + r.ans).join("\n");
+    const parent = key.replace(/\(\d+\)$/, "");
+    const p = rows.filter(r => r.key === parent || r.key.startsWith(parent + " "));
+    return p.map(r => r.ans).join("\n") || "（解答表に該当行なし。解説を確認）";
+  }
+  const sectionOf = (md, no) => { const m = md.split(/^(?=## 問\s*\d)/m).find(s => new RegExp(`^## 問\\s*${no}\\b`).test(s)); return m || ""; };
+  const count = s => s.replace(/\s/g, "").length;
+
+  // ---------- 開始画面 ----------
+  function viewSetup() {
+    clearInterval(tick);
+    const hist = ls.get(HKEY, []);
+    const byFmt = f => manifest.exams.filter(e => fmtOf(e) === f);
+    let html = `<div class="wrap"><p class="sub"><a href="../">← 午後 過去問解説</a></p>
+      <h1>午後 模試</h1>
+      <p class="sub">本番と同じように，時間を計って問題を選び，記述で解答します。終わると公式解答例と並べて自己採点できます。</p>`;
+    if (st && !st.done) html += `<div class="card"><h2>途中の模試があります</h2><p class="sub">${esc(st.label)}（残り ${fmt(remain())}）</p>
+      <div class="row"><button class="btn" id="resume">続きから解く</button><button class="btn sec" id="discard">破棄する</button></div></div>`;
+    html += `<div class="card"><h2>1. 形式</h2><div class="opts">`;
+    for (const [k, f] of Object.entries(FORMATS)) html += `<label class="opt"><input type="radio" name="fmt" value="${k}" ${k === "pm" ? "checked" : ""}><span><b>${f.label}</b><small>${f.desc}・${byFmt(k).length}回分</small></span></label>`;
+    html += `</div></div>
+      <div class="card"><h2>2. 回</h2><select id="exam"></select></div>
+      <div class="card"><h2>3. 解き方（CBT想定）</h2><ul class="notes">
+        <li>問題は画面で読み，解答はキーボードで入力します。字数制限のある設問は入力欄の下に字数が出ます（空白・改行は数えません）。</li>
+        <li>問題の選択は，解答画面の上の「この問を解答する」で行います。選べる数を超えて選ぶことはできません。</li>
+        <li>迷った設問は「見直し」で印を付けられます。</li>
+        <li>時間になると自動で終了します。途中で閉じても，この端末なら続きから再開できます。</li>
+        <li>紙の問題冊子への書込みはできないので，メモが必要なら手元の紙を使ってください。</li>
+      </ul></div>
+      <button class="btn" id="start" style="width:100%">試験開始</button>`;
+    if (hist.length) html += `<div class="card" style="margin-top:16px"><h2>これまでの結果</h2><table class="hist"><tr><th>日付</th><th>回</th><th>得点（自己採点）</th></tr>${hist.slice(-10).reverse().map(h => `<tr><td>${esc(h.date)}</td><td>${esc(h.label)}</td><td>${h.score}%</td></tr>`).join("")}</table></div>`;
+    $app.innerHTML = html + `</div>`;
+    const sel = document.getElementById("exam");
+    const fill = () => { const f = document.querySelector("input[name=fmt]:checked").value;
+      sel.innerHTML = `<option value="">ランダム</option>` + byFmt(f).map(e => `<option value="${e.id}">${esc(e.label)}</option>`).join(""); };
+    document.querySelectorAll("input[name=fmt]").forEach(r => r.onchange = fill); fill();
+    document.getElementById("start").onclick = () => {
+      const f = document.querySelector("input[name=fmt]:checked").value, list = byFmt(f);
+      const e = sel.value ? list.find(x => x.id === sel.value) : list[Math.floor(Math.random() * list.length)];
+      start(e, f);
+    };
+    const r = document.getElementById("resume"); if (r) r.onclick = viewExam;
+    const d = document.getElementById("discard"); if (d) d.onclick = () => { if (confirm("途中の模試を破棄しますか？")) { st = null; save(); viewSetup(); } };
+  }
+
+  async function start(e, f) {
+    const qs = [];
+    for (const q of e.questions) {
+      const md = await load(`../${e.id}/mondai_q${q.no}.md`);
+      qs.push({ no: q.no, theme: q.theme, items: parseItems(md) });
+    }
+    st = { id: e.id, label: e.label, fmt: f, minutes: FORMATS[f].minutes, pick: FORMATS[f].pick, startedAt: Date.now(),
+           qs, chosen: [], answers: {}, flags: {}, cur: e.questions[0].no, view: "q", done: false };
+    save(); viewExam();
+  }
+  const remain = () => Math.max(0, st.startedAt + st.minutes * 60000 - Date.now());
+  const fmt = ms => { const s = Math.ceil(ms / 1000); return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
+
+  // ---------- 試験画面 ----------
+  function viewExam() {
+    const q = st.qs.find(x => x.no === st.cur);
+    const chosen = st.chosen.includes(q.no), full = st.chosen.length >= st.pick && !chosen;
+    $app.innerHTML = `<div class="exam">
+      <div class="ebar"><span class="timer" id="timer">${fmt(remain())}</span>
+        <div class="qtabs">${st.qs.map(x => `<button class="qtab ${x.no === st.cur ? "on" : ""}" data-no="${x.no}">問${x.no}${st.chosen.includes(x.no) ? '<span class="sel">✓解答</span>' : ""}</button>`).join("")}</div>
+        <button class="btn sec" id="end" style="padding:6px 12px">終了</button></div>
+      <div class="ebody" data-view="${st.view}">
+        <div class="pane p"><iframe id="qf" title="問題文" src="../index.html?embed#/${st.id}/${q.no}/mondai"></iframe></div>
+        <div class="pane a"><div class="ans">
+          <label class="pick"><input type="checkbox" id="pick" ${chosen ? "checked" : ""} ${full ? "disabled" : ""}>
+            <span><b>問${q.no}を解答する</b>（${st.chosen.length}/${st.pick}問選択中）${full ? "<br><small>選べる数に達しています。ほかの問の選択を外すと選べます。</small>" : ""}</span></label>
+          <div class="${chosen ? "" : "dis"}">${q.items.map(it => {
+            const k = `${q.no}:${it.key}`, v = st.answers[k] || "", n = count(v);
+            return `<div class="item ${st.flags[k] ? "flag" : ""}" data-k="${esc(k)}"><div class="ih"><b>${esc(it.key)}</b><span class="q">${esc(it.q.length > 90 ? it.q.slice(0, 90) + "…" : it.q)}</span><button class="flagbtn">見直し</button></div>
+              <textarea ${chosen ? "" : "disabled"} placeholder="${chosen ? "" : "この問を選択すると入力できます"}">${esc(v)}</textarea>
+              <div class="meta"><span></span><span class="cnt ${it.limit && n > it.limit ? "over" : ""}">${n}${it.limit ? ` / ${it.limit}字` : "字"}</span></div></div>`;
+          }).join("") || '<p class="sub">設問を読み取れませんでした。</p>'}</div>
+        </div></div>
+      </div>
+      <div class="switch"><button data-v="q" class="${st.view === "q" ? "on" : ""}">問題</button><button data-v="a" class="${st.view === "a" ? "on" : ""}">解答</button></div>
+    </div>`;
+    $app.querySelectorAll(".qtab").forEach(b => b.onclick = () => { st.cur = +b.dataset.no; save(); viewExam(); });
+    $app.querySelectorAll(".switch button").forEach(b => b.onclick = () => { st.view = b.dataset.v; save(); viewExam(); });
+    document.getElementById("pick").onchange = ev => {
+      st.chosen = ev.target.checked ? [...st.chosen, q.no] : st.chosen.filter(n => n !== q.no);
+      if (ev.target.checked) st.view = "a";
+      save(); viewExam();
+    };
+    $app.querySelectorAll(".item").forEach(el => {
+      const k = el.dataset.k, it = q.items.find(i => `${q.no}:${i.key}` === k), ta = el.querySelector("textarea"), c = el.querySelector(".cnt");
+      ta.oninput = () => { st.answers[k] = ta.value; save(); const n = count(ta.value); c.textContent = `${n}${it.limit ? ` / ${it.limit}字` : "字"}`; c.classList.toggle("over", !!it.limit && n > it.limit); };
+      el.querySelector(".flagbtn").onclick = () => { st.flags[k] = !st.flags[k]; save(); el.classList.toggle("flag", st.flags[k]); };
+    });
+    document.getElementById("end").onclick = () => {
+      const fl = Object.entries(st.flags).filter(([, v]) => v).length;
+      if (confirm(`試験を終了して採点に進みますか？${fl ? `\n（見直しの印が${fl}か所あります）` : ""}`)) finish();
+    };
+    clearInterval(tick);
+    tick = setInterval(() => { const r = remain(), t = document.getElementById("timer"); if (!t) return;
+      t.textContent = fmt(r); t.classList.toggle("low", r < 10 * 60000); if (r <= 0) { alert("試験時間が終了しました。"); finish(); } }, 1000);
+  }
+
+  function finish() { clearInterval(tick); st.done = true; st.endedAt = Date.now(); st.grades = st.grades || {}; save(); viewResult(); }
+
+  // ---------- 結果画面 ----------
+  async function viewResult() {
+    const md = await load(`../${st.id}/kaitou_kaisetsu.md`);
+    const used = Math.round((Math.min(st.endedAt, st.startedAt + st.minutes * 60000) - st.startedAt) / 60000);
+    const target = st.chosen.length ? st.chosen : [];
+    let html = `<div class="wrap"><p class="sub"><a href="../">← 午後 過去問解説</a></p><h1>模試の結果</h1>
+      <p class="sub">${esc(st.label)}・解答時間 ${used}分 / ${st.minutes}分</p>
+      <div class="card"><div class="row" style="justify-content:space-between"><span>自己採点（◎＝2点，△＝1点，×＝0点）</span><span class="score" id="score"></span></div>
+      <p class="sub" style="margin:0">公式解答例と見比べて，要点が合っていれば◎，一部なら△を付けてください。本番の合格基準は60点（100点満点）です。</p></div>`;
+    if (!target.length) html += `<div class="card"><p>解答する問が選ばれていませんでした。</p></div>`;
+    for (const no of target) {
+      const q = st.qs.find(x => x.no === no), rows = parseOfficial(sectionOf(md, no));
+      html += `<div class="card"><h2>問${no} ${esc(q.theme)}　<a href="../#/${st.id}/${no}/kaisetsu" target="_blank" style="font-size:.85rem;font-weight:500">解説を開く →</a></h2>`;
+      for (const it of q.items) {
+        const k = `${no}:${it.key}`, mine = st.answers[k] || "", n = count(mine), g = st.grades[k];
+        html += `<div class="res-item" data-k="${esc(k)}"><div class="row" style="justify-content:space-between"><span class="res-k">${esc(it.key)}${st.flags[k] ? " 🔖" : ""}</span>
+          <span class="grade">${[["2", "◎"], ["1", "△"], ["0", "×"]].map(([v, l]) => `<button data-g="${v}" class="${g === +v ? "on" : ""}">${l}</button>`).join("")}</span></div>
+          <div class="cmp"><div class="mine">${esc(mine) || "（未記入）"}${it.limit ? `\n<small style="color:${n > it.limit ? "var(--ng)" : "var(--muted)"}">${n}/${it.limit}字</small>` : ""}</div><div class="off">${esc(officialFor(rows, it.key))}</div></div></div>`;
+      }
+      html += `</div>`;
+    }
+    html += `<div class="row"><button class="btn" id="again">もう一度（別の回）</button><a class="btn sec" href="../">解説サイトへ</a></div></div>`;
+    $app.innerHTML = html;
+    const all = target.flatMap(no => st.qs.find(x => x.no === no).items.map(it => `${no}:${it.key}`));
+    const upd = () => { const pts = all.reduce((a, k) => a + (st.grades[k] ?? 0), 0), max = all.length * 2;
+      const pct = max ? Math.round(pts / max * 100) : 0; document.getElementById("score").textContent = `${pct}%`; return pct; };
+    upd();
+    $app.querySelectorAll(".res-item").forEach(el => el.querySelectorAll(".grade button").forEach(b => b.onclick = () => {
+      st.grades[el.dataset.k] = +b.dataset.g; save();
+      el.querySelectorAll(".grade button").forEach(x => x.classList.toggle("on", x === b)); upd();
+    }));
+    document.getElementById("again").onclick = () => {
+      const hist = ls.get(HKEY, []);
+      hist.push({ date: new Date(st.startedAt).toLocaleDateString("ja-JP"), label: st.label, score: upd() });
+      ls.set(HKEY, hist); st = null; save(); viewSetup();
+    };
+  }
+
+  fetch("../manifest.json", { cache: "no-cache" }).then(r => r.json()).then(m => {
+    manifest = m;
+    if (st && st.done) viewResult(); else viewSetup();
+  }).catch(e => { $app.innerHTML = `<div class="wrap"><p>読み込みに失敗しました：${esc(e.message)}</p></div>`; });
+})();
+</script>
+</body>
+</html>
