@@ -137,6 +137,9 @@ h1.page { font-size: 1.5rem; margin: 0 0 4px; line-height: 1.4; }
 .md p.lbl-ans strong.tl { background: var(--ok); color: #fff; }
 .md u { text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 .j-ok { color: var(--ok); font-weight: 700; } .j-mid { color: var(--mid); font-weight: 700; } .j-ng { color: var(--ng); font-weight: 700; }
+/* 模試ページから iframe で埋め込むとき（?embed）。サイトの枠とタブを隠し，本文だけを出す */
+html.embed header.top, html.embed footer, html.embed .crumbs, html.embed .qhead, html.embed .tabs, html.embed .pager, html.embed .qbar { display: none !important; }
+html.embed main { padding-top: 8px; }
 footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; padding: 20px 0 40px; }
 .err { color: var(--ng); }
 /* 問題ページ：上部固定タブ・下部固定バー・目次シート */
@@ -220,6 +223,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 <header class="top"><div class="wrap">
   <a class="brand" href="#/">SC午後 過去問解説<small>情報処理安全確保支援士</small></a>
   <span class="spacer"></span>
+  <a href="mock/" style="font-size:.88rem;white-space:nowrap">午後 模試</a>
   <a href="am2/" style="font-size:.88rem;white-space:nowrap">午前II 道場 →</a>
   <button class="iconbtn" id="themeBtn" title="表示テーマ切替" aria-label="表示テーマ切替">🌓</button>
 </div></header>
@@ -293,6 +297,8 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     return out;
   };
 
+  const EMBED = new URLSearchParams(location.search).has("embed");
+  if (EMBED) document.documentElement.classList.add("embed");
   let manifest = null;
   const doneKey = (e, n) => "done:" + e + ":" + n;
   const judgeBar = j => {
@@ -405,7 +411,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     const restore = () => window.scrollTo(0, scrollPos[posKey] || 0);
     curPosKey = posKey;
     const revealKey = "reveal:" + id + ":" + no;
-    if (tab !== "mondai" && !store.get(revealKey, false)) {
+    if (tab !== "mondai" && !EMBED && !store.get(revealKey, false)) {
       panel.innerHTML = `<div class="gate"><p>先に自分で解いてみましょう。<br>答えを表示すると、この問題では次回から確認なしで表示します。</p>
         <button class="btn" id="reveal">答えを表示する</button></div>`;
       document.getElementById("reveal").onclick = () => { store.set(revealKey, true); show(); };
