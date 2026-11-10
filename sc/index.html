@@ -356,7 +356,7 @@ body.in-q footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     try {
       const sh = splitSections(await load(`${id}/shougou.md`));
       $app.innerHTML = html + `<div class="panel">${render(sh.head + sh.common.join(""))}</div>
-        <p class="sub" style="margin-top:14px">原本：<a href="../pdf/${e.pdf}_qs.pdf">問題PDF</a> ・ <a href="../pdf/${e.pdf}_ans.pdf">解答例PDF</a></p>`;
+        ${e.pdf ? `<p class="sub" style="margin-top:14px">原本：<a href="../pdf/${e.pdf}_qs.pdf">問題PDF</a> ・ <a href="../pdf/${e.pdf}_ans.pdf">解答例PDF</a></p>` : ""}`;
     } catch (err) {
       $app.innerHTML = html + `<div class="panel"><p class="sub">照合結果はまだありません。</p></div>`;
     }

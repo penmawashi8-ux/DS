@@ -92,7 +92,7 @@ iframe { border: 0; width: 100%; flex: 1; background: var(--bg); }
 .cmp div.off { background: var(--ok-weak); }
 .cmp div::before { display: block; font-size: .72rem; color: var(--muted); font-weight: 700; }
 .cmp div.mine::before { content: "あなたの解答"; }
-.cmp div.off::before { content: "公式解答例"; }
+.cmp div.off::before { content: "解答例"; }
 @media (max-width: 560px) { .cmp { grid-template-columns: 1fr; } }
 .grade { display: flex; gap: 6px; }
 .grade button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 2px 12px; }
@@ -119,8 +119,9 @@ iframe { border: 0; width: 100%; flex: 1; background: var(--bg); }
     pm:  { label: "午後（新形式）", minutes: 150, pick: 2, desc: "問1〜問4から2問選択・150分" },
     pm1: { label: "午後I（旧形式）", minutes: 90, pick: 2, desc: "問1〜問3から2問選択・90分" },
     pm2: { label: "午後II（旧形式）", minutes: 120, pick: 1, desc: "問1・問2から1問選択・120分" },
+    orig: { label: "オリジナル問題", minutes: 75, pick: 1, desc: "本サイト作成の問題を1問・75分（午後150分の半分）" },
   };
-  const fmtOf = e => /-pm1$/.test(e.id) ? "pm1" : /-pm2$/.test(e.id) ? "pm2" : "pm";
+  const fmtOf = e => e.id === "original" ? "orig" : /-pm1$/.test(e.id) ? "pm1" : /-pm2$/.test(e.id) ? "pm2" : "pm";
   const load = p => fetch(p, { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(p); return r.text(); });
   let manifest, st = ls.get(KEY, null), tick = null;
   const save = () => ls.set(KEY, st);
@@ -264,7 +265,7 @@ iframe { border: 0; width: 100%; flex: 1; background: var(--bg); }
     let html = `<div class="wrap"><p class="sub"><a href="../">← 午後 過去問解説</a></p><h1>模試の結果</h1>
       <p class="sub">${esc(st.label)}・解答時間 ${used}分 / ${st.minutes}分</p>
       <div class="card"><div class="row" style="justify-content:space-between"><span>自己採点（◎＝2点，△＝1点，×＝0点）</span><span class="score" id="score"></span></div>
-      <p class="sub" style="margin:0">公式解答例と見比べて，要点が合っていれば◎，一部なら△を付けてください。本番の合格基準は60点（100点満点）です。</p></div>`;
+      <p class="sub" style="margin:0">解答例と見比べて，要点が合っていれば◎，一部なら△を付けてください。本番の合格基準は60点（100点満点）です。</p></div>`;
     if (!target.length) html += `<div class="card"><p>解答する問が選ばれていませんでした。</p></div>`;
     for (const no of target) {
       const q = st.qs.find(x => x.no === no), rows = parseOfficial(sectionOf(md, no));
