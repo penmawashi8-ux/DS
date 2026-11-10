@@ -19,6 +19,8 @@ EXAM_RE = re.compile(r"(\d{4})r(\d{2})([ha])(?:-pm([12]))?")
 
 
 def exam_info(exam_id):
+    if exam_id == "original":
+        return {"label": "オリジナル問題", "part": "午後", "note": "本サイトで作成した練習用の問題（IPAの過去問ではない）。", "pdf": ""}
     m = EXAM_RE.fullmatch(exam_id)
     if not m:
         return {"label": exam_id, "part": "午後", "note": "", "pdf": exam_id + "_sc_pm"}
@@ -102,7 +104,7 @@ def main():
             "hasAnswer": (d / "kaitou_kaisetsu.md").exists(),
             "hasCompare": bool(shougou),
             # 自作解答との照合（◎○△×）があれば「公式との照合」，なければ公式解答例・講評だけ
-            "compareLabel": "公式との照合" if any(judge_counts(shougou).values()) else "公式解答・講評",
+            "compareLabel": "出題のねらい" if d.name == "original" else "公式との照合" if any(judge_counts(shougou).values()) else "公式解答・講評",
             "questions": questions,
         })
     out = ROOT / "manifest.json"
